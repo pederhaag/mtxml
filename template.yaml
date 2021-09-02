@@ -1,9 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  mtxmlsam
-
-  Sample SAM Template for mtxmlsam
+  MTXML API
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -39,6 +37,6 @@ Outputs:
   MtXmlFunction:
     Description: "MT to XML Lambda Function ARN"
     Value: !GetAtt MtXmlFunction.Arn
-  MtXmlIamRole:
+  MtXmlFunctionIamRole:
     Description: "Implicit IAM Role created for mtxml Lambdas"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+    Value: !GetAtt MtXmlFunctionRole.Arn
