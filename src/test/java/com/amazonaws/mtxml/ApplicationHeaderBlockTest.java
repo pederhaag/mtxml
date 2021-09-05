@@ -25,6 +25,10 @@ public class ApplicationHeaderBlockTest {
 	final static String invalidInputBlock1 = "{2:I527ABCDEFGHXBR?N}";
 	final static String invalidInputBlock2 = "{2:I99DDDDEFGHXXXXN}";
 
+	private String createAndGet(String blockContents, String field) {
+		return new ApplicationHeaderBlock(blockContents).getData(field);
+	}
+
 	/*
 	 * Valid constructors
 	 */
@@ -47,12 +51,8 @@ public class ApplicationHeaderBlockTest {
 	 * Invalid (null) constructors
 	 */
 	@Test
-	public void testApplicationHeaderBlockInvalidNull() {
+	void testApplicationHeaderBlockInvalidNull() {
 		assertThrows(NullPointerException.class, () -> new ApplicationHeaderBlock(null));
-	}
-
-	private String createAndGet(String blockContents, String field) {
-		return new ApplicationHeaderBlock(blockContents).getData(field);
 	}
 
 	/*
@@ -231,8 +231,9 @@ public class ApplicationHeaderBlockTest {
 	}
 
 	private static Stream<Arguments> blockToMIRLogicalTerminal() {
-		return Stream.of(Arguments.arguments(outputBlock1, "BANKBICSAXXX"), Arguments.arguments(outputBlock2, "MYBANKTUBBRA"),
-				Arguments.arguments(inputBlock1, null), Arguments.arguments(inputBlock2, null));
+		return Stream.of(Arguments.arguments(outputBlock1, "BANKBICSAXXX"),
+				Arguments.arguments(outputBlock2, "MYBANKTUBBRA"), Arguments.arguments(inputBlock1, null),
+				Arguments.arguments(inputBlock2, null));
 	}
 
 	/*

@@ -1,10 +1,12 @@
 package com.amazonaws.mtxml;
 
-public class TrailerBlock {
+/*
+ * https://www.paiementor.com/swift-mt-message-block-5-trailers-description/
+ */
+public class TrailerBlock extends TagBlock implements MTComponent {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+	TrailerBlock(String content) {
+		super(content, "5");
 	}
 
 }

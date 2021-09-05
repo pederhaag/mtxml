@@ -1,18 +1,21 @@
 package com.amazonaws.mtxml;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class TagBlock implements MTComponent {
+	private final static String regexPatternTag = "\\{(.*?):(.*?)\\}";
+	private final static String regexPatternTagSequence = "(?>\\{.*?\\})+$";
+	private String blockIdentifier;
 
-//	static String regexPattern;
-	private final static String regexPatternTag = "\\{(\\d*?):(.*?)\\}";
-	private final static String regexPatternTagSequence = "(?>\\{.*?\\})+";
+	private ArrayList<HeaderTag> tags;
 
 	TagBlock(String content, String BlockIdentifier) {
-		String regexPattern = "\\{(" + BlockIdentifier + "):(.*)\\}";
-		
-		Pattern blockPattern = Pattern.compile(regexPattern);
+		this.blockIdentifier = BlockIdentifier;
+		String regexPattern = "\\{(" + BlockIdentifier + "):(.*)\\}$";
+
+		Pattern blockPattern = Pattern.compile(regexPattern, Pattern.MULTILINE);
 		Matcher blockmatcher = blockPattern.matcher(content);
 
 		if (!blockmatcher.find()) {
@@ -26,11 +29,12 @@ public abstract class TagBlock implements MTComponent {
 		if (!tagListMatcher.matches()) {
 			throw new SyntaxException(regexPatternTagSequence, tagString);
 		}
-		
+
 		Pattern tagPattern = Pattern.compile(regexPatternTag);
 		Matcher tagMatcher = tagPattern.matcher(tagString);
 
-		initTagCollection();
+//		initTagCollection();
+		tags = new ArrayList<HeaderTag>();
 		while (tagMatcher.find()) {
 			addTag(tagMatcher.group(1), tagMatcher.group(2));
 		}
@@ -42,7 +46,40 @@ public abstract class TagBlock implements MTComponent {
 		return null;
 	}
 
-	abstract void addTag(String tag, String value);
-	abstract void initTagCollection();
+	public String getBlockIdentifier() {
+		return blockIdentifier;
+	}
+
+	void addTag(String tag, String value) {
+		tags.add(new HeaderTag(tag, value));
+	}
+
+//	abstract void addTag(String tag, String value);
+//	abstract String getTag(String tag);
+//	abstract String getTag(int index);
+//	abstract void initTagCollection();
+
+	String getTag(String tag) {
+		if (tag == null) {
+			throw new NullPointerException("Tag cannot be null.");
+		}
+		if (tag.equals("")) {
+			throw new IllegalArgumentException("Tag must be a non-empty string.");
+		}
+
+		if (tag.equals("BlockIdentifier")) {
+			return blockIdentifier;
+		}
+		for (HeaderTag t : tags) {
+			if (t.tag.equals(tag)) {
+				return t.value;
+			}
+		}
+		return null;
+	}
+
+	String getTag(int index) {
+		return tags.get(index).value;
+	}
 
 }
