@@ -9,8 +9,8 @@ public class HeaderTag {
 			String msg = String.format("Tag (%s) and value (%s) must be non-null", tag, value);
 			throw new NullPointerException(msg);
 		}
-		if (tag.equals("") || value.equals("")) {
-			String msg = String.format("Tag (%s) and value (%s) must be non-empty", tag, value);
+		if (tag.equals("")) {
+			String msg = String.format("Tag (%s) must be non-empty", tag, value);
 			throw new IllegalArgumentException(msg);
 		}
 

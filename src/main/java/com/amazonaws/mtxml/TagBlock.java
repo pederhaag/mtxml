@@ -33,7 +33,6 @@ public abstract class TagBlock implements MTComponent {
 		Pattern tagPattern = Pattern.compile(regexPatternTag);
 		Matcher tagMatcher = tagPattern.matcher(tagString);
 
-//		initTagCollection();
 		tags = new ArrayList<HeaderTag>();
 		while (tagMatcher.find()) {
 			addTag(tagMatcher.group(1), tagMatcher.group(2));
@@ -53,11 +52,6 @@ public abstract class TagBlock implements MTComponent {
 	void addTag(String tag, String value) {
 		tags.add(new HeaderTag(tag, value));
 	}
-
-//	abstract void addTag(String tag, String value);
-//	abstract String getTag(String tag);
-//	abstract String getTag(int index);
-//	abstract void initTagCollection();
 
 	String getTag(String tag) {
 		if (tag == null) {
