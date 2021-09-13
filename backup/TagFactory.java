@@ -43,10 +43,10 @@ public class TagFactory {
 		charsetsPatterns.put("c", "[A-Z0-9]");
 		charsetsPatterns.put("h", "[A-F0-9]");
 		charsetsPatterns.put("d", "[0-9,]"); // Needs special care in order to consider decimals nnnnn,nn and decimals
-												// type see 98H specs
+											// type see 98H specs
 
 		// SWIFT Charactersets
-		charsetsPatterns.put("x", "[a-zA-Z0-9\\/\\-?:().,'+ \\n]");
+		charsetsPatterns.put("x", "[a-zA-Z0-9\\/\\-?:().,'+ ]");
 		charsetsPatterns.put("y", "[A-Z0-9\\/\\-?:().,'+=!\\\"%&*<>; ]");
 		charsetsPatterns.put("z", "[a-zA-Z0-9\\/\\-?:().,'+=!\\\"%&*<>;{@#_ \\r\\n]");
 
@@ -62,6 +62,8 @@ public class TagFactory {
 
 		Pattern tagInfoPattern = Pattern.compile(
 				"(?<BracketPrefix>\\[)?(?<Prefix>(?>[/A-Z :,])*)(?>(?<NewLine>\\\\n)|(?<UTCInd>\\[N\\]2!n\\[2!n\\])|(?<Length>\\d+(?>\\-\\d+|!|\\*\\d+)?)(?<Charset>n|a|h|x|y|z|c|d)|(?<Static>[^\\[\\]]))(?<Suffix>/*)(?<BracketSuffix>\\])?");
+//		Pattern tagInfoPattern = Pattern.compile(
+//				"(?<BracketPrefix>\\[)?(?<Prefix>(?>[/A-Z :,])*)(?>(?<UTCInd>\\[N\\]2!n\\[2!n\\])|(?<Length>\\d+(?>\\-\\d+|!|\\*\\d+)?)(?<Charset>n|a|h|x|y|z|c|d)|(?<Static>[^\\[\\]]))(?<Suffix>/*)(?<BracketSuffix>\\])?");
 
 		Matcher tagInfoMatcher;
 
@@ -72,12 +74,11 @@ public class TagFactory {
 			String format = row.getField(1);
 			String formatinfo = row.getField(2);
 
-			if (tag.equals("50A") || 1 < 2) {
+			if (tag.equals("33B") || 1 < 2) {
 				tagInfoMatcher = tagInfoPattern.matcher(format);
 				fieldDescriptionMatcher = fieldDescriptionPattern.matcher(formatinfo);
-				String tagRegx = "";
+				String fieldRegex = "";
 				ArrayList<String> fieldList = new ArrayList<String>();
-				String largerOptionalGrpRegex = "";
 
 				while (tagInfoMatcher.find()) {
 					String fieldName = null;
@@ -87,44 +88,21 @@ public class TagFactory {
 						fieldList.add(fieldName);
 						tagFieldsCharsets.put(tag + ":" + fieldName, tagInfoMatcher.group("Charset"));
 					}
-
-					String LeftBracket = tagInfoMatcher.group("BracketPrefix");
-					String RightBracket = tagInfoMatcher.group("BracketSuffix");
-					String subfieldRegex = createFieldRegex(tagInfoMatcher, fieldName);
-					if (LeftBracket != null && RightBracket != null) {
-						// Individual optional tag
-						tagRegx += String.format("(?>%s)?", subfieldRegex);
-
-					} else if (LeftBracket != null && RightBracket == null) {
-						// Start of larger optional group
-						largerOptionalGrpRegex = subfieldRegex;
-
-					} else if (LeftBracket == null && RightBracket != null) {
-						// End of larger optional group
-						largerOptionalGrpRegex += subfieldRegex;
-						tagRegx += String.format("(?>%s)?", largerOptionalGrpRegex);
-						largerOptionalGrpRegex = "";
-					} else if (LeftBracket == null && RightBracket == null)
-						if (largerOptionalGrpRegex.length() > 0) {
-							// Middle of larger optional group
-							largerOptionalGrpRegex += subfieldRegex;
-						} else {
-							// Single non-optional field
-							tagRegx += subfieldRegex;
-						}
+					fieldRegex += createFieldRegex(tagInfoMatcher, fieldName);
 
 				}
-				tagRegex.put(tag, tagRegx);
+				tagRegex.put(tag, fieldRegex);
 				tagFields.put(tag, fieldList);
 
-//				System.out.println(tag + " ==> " + format + "\n" + "REGEX:" + tagRegx + "\n");
+//				System.out.println(tag + " ==> " + format + " --> " + formatInfo + "\n" + "REGEX:" + fieldRegex + "\n");
+				System.out.println(tag + " ==> " + format + "\n" + "REGEX:" + fieldRegex + "\n");
 
 			}
 		}
 
 	}
 
-	public static String getRegexQuantifier(String desc) throws Exception {
+	public static String getLengthRegex(String desc) throws Exception {
 		int i = desc.indexOf('-');
 		if (i > 0) {
 			String from = desc.substring(0, i);
@@ -133,7 +111,7 @@ public class TagFactory {
 		}
 		i = desc.indexOf('*');
 		if (i > 0) {
-			throw new Exception("getRegexQuantifier should not be called with '*' as argument.");
+			throw new Exception("getLengthRegex should not be called with '*' as argument.");
 		}
 		i = desc.indexOf('!');
 		if (i > 0) {
@@ -143,24 +121,21 @@ public class TagFactory {
 		return String.format("{%s,%s}", 0, desc);
 	}
 
+	public static String getCharsetRegex(String charset) {
+		return charsetsPatterns.get(charset.charAt(0));
+	}
+
 	public static String createFieldRegex(Matcher tagInfoMatcher, String fieldName) throws Exception {
-//		String LeftBracket = tagInfoMatcher.group("BracketPrefix");
+		String BracketPrefix = tagInfoMatcher.group("BracketPrefix");
 		String Prefix = regexExcape(tagInfoMatcher.group("Prefix"));
 		String length = tagInfoMatcher.group("Length");
 		String Charset = tagInfoMatcher.group("Charset");
 		String Suffix = regexExcape(tagInfoMatcher.group("Suffix"));
-//		String RightBracket = tagInfoMatcher.group("BracketSuffix");
+		String BracketSuffix = tagInfoMatcher.group("BracketSuffix");
 		String staticField = regexExcape(tagInfoMatcher.group("Static"));
 		String UTCInd = tagInfoMatcher.group("UTCInd");
 		String newLine = tagInfoMatcher.group("NewLine");
-//		Boolean optional = LeftBracket != null && !ignoreOptional;
-
-		String fieldName32;
-		if (fieldName != null) {
-			fieldName32 = fieldName.length() > 32 ? fieldName.substring(0, 32) : fieldName;
-		} else {
-			fieldName32 = fieldName;
-		}
+		Boolean optional = BracketPrefix != null;
 
 		String regex = null;
 		String fieldRegex = null;
@@ -172,22 +147,22 @@ public class TagFactory {
 			regex = "\\n";
 
 		} else if (UTCInd != null) {
-			fieldRegex = String.format("(?<%s>(?>N?(?>%s{2}){1,2}))", fieldName32, charsetsPatterns.get("n"));
+			fieldRegex = String.format("(?<%s>(?>N?(?>%s{2}){1,2}))", fieldName, charsetsPatterns.get("n"));
 
 		} else if (length.contains("*")) {
 			String characterSet = charsetsPatterns.get(Charset);
 			int numLines = Integer.valueOf(length.split("\\*")[0]);
 			String lineLength = length.split("\\*")[1];
-			fieldRegex = String.format("(?<%s>(?>%s{0,%s}(?>\\n%s{0,%s}){0,%d}))", fieldName32, characterSet,
-					lineLength, characterSet, lineLength, numLines - 1);
+			fieldRegex = String.format("(?<%s>(?>%s{0,%s}(?>\\n%s{0,%s}){0,%d}))", fieldName, characterSet, lineLength,
+					characterSet, lineLength, numLines - 1);
 		} else {
 			String charsetRegex = charsetsPatterns.get(Charset);
-			String lengthRegex = getRegexQuantifier(length);
-			fieldRegex = String.format("(?<%s>%s%s)", fieldName32, charsetRegex, lengthRegex);
+			String lengthRegex = getLengthRegex(length);
+			fieldRegex = String.format("(?<%s>%s%s)", fieldName, charsetRegex, lengthRegex);
 		}
 
 		if (regex == null) {
-			regex = String.format("%s%s%s", Prefix, fieldRegex, Suffix);
+			regex = String.format("(?>%s%s%s)%s", Prefix, fieldRegex, Suffix, optional ? "?" : "");
 		}
 
 		return regex;
@@ -202,7 +177,9 @@ public class TagFactory {
 				c = regex.charAt(i);
 				if (c == '/') {
 					sb.append("\\/");
-
+//				} else if (c == '\\') {
+//					sb.append("\\");
+//					sb.append("\\");
 				} else
 					sb.append(c);
 			}
@@ -212,77 +189,32 @@ public class TagFactory {
 
 	}
 
-	public Tag createTag(String tag, String content) throws UnknownTagException, MTException {
-		String log = "";
-
-		ArrayList<String> fieldNames = getTagFieldNames(tag);
-		String tagContentRegex = getTagRegex(tag);
-		Pattern tagContentPattern = Pattern.compile(tagContentRegex, Pattern.MULTILINE);
-		Matcher tagContentMatcher = tagContentPattern.matcher(content);
-		ArrayList<String> fieldValues = new ArrayList<String>();
-
-		tagContentMatcher.find();
-		String fieldValue;
-		for (String fieldName : fieldNames) {
-			fieldValue = tagContentMatcher.group(fieldName);
-			if (fieldName.equals("Amount"))
-				validateAmountField(fieldValue);
-
-			fieldValues.add(fieldValue);
-//			System.out.println(fieldName + " = " + fieldValue);
-
-		}
-		if (tagContentMatcher.end() < content.length()) {
-			System.out.println(String.format(
-					"[Warning] FieldOverrunError: An additional %d characters could not be successfully be treated as part of any subfield.",
-					content.length() - tagContentMatcher.end()));
-		}
-
-		if (fieldNames.get(0).equals("Qualifier")) {
-			String qualifier = fieldValues.remove(0);
-			fieldNames.remove(0);
-			return new Tag(tag, fieldNames, fieldValues, qualifier);
-		} else {
-			return new Tag(tag, fieldNames, fieldValues);
-		}
-
+	public static String createFieldRegexStatic(String fieldSpecs, String fieldName) {
+		Boolean optional = fieldSpecs.charAt(0) == '[';
+		String value = optional ? fieldSpecs.substring(1, fieldSpecs.length() - 1) : fieldSpecs;
+		return String.format("(?<%s>(?>%s)%s)", fieldName, value, optional ? "?" : "");
 	}
 
-	private void validateAmountField(String value) throws SyntaxException {
-		String error = null;
-		int commaIx = value.indexOf(',');
-		if (commaIx == -1) {
-			error = "Malformed amount field: Lacking comma";
-		} else if (commaIx == 0) {
-			error = "Malformed amount field: Lacking digits ahead of comma";
-		} else if (value.indexOf(',', commaIx + 1) > -1) {
-			error = "Malformed amount field: Multiple commas in field";
-		}
-		if (error != null) {
-			throw new SyntaxException(error);
-		}
+	public Tag createTag() {
+		return null;
 	}
 
-	private ArrayList<String> getTagFieldNames(String tag) throws UnknownTagException {
-		if (tagFields.containsKey(tag)) {
-			return tagFields.get(tag);
-		}
-		throw new UnknownTagException(tag);
-	}
-
-	private String getTagRegex(String tag) throws UnknownTagException {
-		if (tagRegex.containsKey(tag)) {
-			return tagRegex.get(tag);
-		}
-		throw new UnknownTagException(tag);
-	}
-
-	public static void main(String[] args) throws IOException, UnknownTagException, MTException {
+	public static void main(String[] args) throws IOException {
 		TagFactory tf = new TagFactory();
-//		tf.createTag("33B", "NOK123456789,123456456987");
-		Tag myTag = tf.createTag("33B", "NOK123456,123");
-		System.out.println(myTag);
+		int sink = 1+1;
+		// TODO: Videre.. sjekk at ting fungerer hvor multiline strings kombineres med
+		// andre ting f.eks i tag 95V
+		// .... ser ut som det gaar noe feil der, men i Qualifier felt, ikke
+		// NameAndAddress.. interessant
 
+		// Deretter maa jeg jobbe med <br /> feltene.... Usikker paa hva fremgangsmaaten
+		// blir der (f.eks tag 88D)
+
+//		System.out.println(createFieldRegex("4!", "c", "Qualifier"));
+
+//		System.out.println(createFieldRegexStatic("N", "Sign"));
+//		System.out.println(createFieldRegexStatic("[ASD]", "Sign"));
+//		System.out.println(createFieldRegexStatic("ASD", "Sign"));
 	}
 
 }
