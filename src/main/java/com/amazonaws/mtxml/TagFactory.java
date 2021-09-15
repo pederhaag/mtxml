@@ -65,61 +65,57 @@ public class TagFactory {
 
 		Matcher tagInfoMatcher;
 
-		System.out.println("TagInfoPattern: " + tagInfoPattern);
-
 		for (CsvRow row : reader) {
 			String tag = row.getField(0);
 			String format = row.getField(1);
 			String formatinfo = row.getField(2);
 
-			if (tag.equals("50A") || 1 < 2) {
-				tagInfoMatcher = tagInfoPattern.matcher(format);
-				fieldDescriptionMatcher = fieldDescriptionPattern.matcher(formatinfo);
-				String tagRegx = "";
-				ArrayList<String> fieldList = new ArrayList<String>();
-				String largerOptionalGrpRegex = "";
+			tagInfoMatcher = tagInfoPattern.matcher(format);
+			fieldDescriptionMatcher = fieldDescriptionPattern.matcher(formatinfo);
+			String tagRegx = "";
+			ArrayList<String> fieldList = new ArrayList<String>();
+			String largerOptionalGrpRegex = "";
 
-				while (tagInfoMatcher.find()) {
-					String fieldName = null;
-					if (tagInfoMatcher.group("NewLine") == null) {
-						fieldDescriptionMatcher.find();
-						fieldName = fieldDescriptionMatcher.group(1);
-						fieldList.add(fieldName);
-						tagFieldsCharsets.put(tag + ":" + fieldName, tagInfoMatcher.group("Charset"));
+			while (tagInfoMatcher.find()) {
+				String fieldName = null;
+				if (tagInfoMatcher.group("NewLine") == null) {
+					fieldDescriptionMatcher.find();
+					fieldName = fieldDescriptionMatcher.group(1);
+					fieldList.add(fieldName);
+					tagFieldsCharsets.put(tag + ":" + fieldName, tagInfoMatcher.group("Charset"));
+				}
+
+				String LeftBracket = tagInfoMatcher.group("BracketPrefix");
+				String RightBracket = tagInfoMatcher.group("BracketSuffix");
+				String subfieldRegex = createFieldRegex(tagInfoMatcher, fieldName);
+				if (LeftBracket != null && RightBracket != null) {
+					// Individual optional tag
+					tagRegx += String.format("(?>%s)?", subfieldRegex);
+
+				} else if (LeftBracket != null && RightBracket == null) {
+					// Start of larger optional group
+					largerOptionalGrpRegex = subfieldRegex;
+
+				} else if (LeftBracket == null && RightBracket != null) {
+					// End of larger optional group
+					largerOptionalGrpRegex += subfieldRegex;
+					tagRegx += String.format("(?>%s)?", largerOptionalGrpRegex);
+					largerOptionalGrpRegex = "";
+				} else if (LeftBracket == null && RightBracket == null)
+					if (largerOptionalGrpRegex.length() > 0) {
+						// Middle of larger optional group
+						largerOptionalGrpRegex += subfieldRegex;
+					} else {
+						// Single non-optional field
+						tagRegx += subfieldRegex;
 					}
 
-					String LeftBracket = tagInfoMatcher.group("BracketPrefix");
-					String RightBracket = tagInfoMatcher.group("BracketSuffix");
-					String subfieldRegex = createFieldRegex(tagInfoMatcher, fieldName);
-					if (LeftBracket != null && RightBracket != null) {
-						// Individual optional tag
-						tagRegx += String.format("(?>%s)?", subfieldRegex);
-
-					} else if (LeftBracket != null && RightBracket == null) {
-						// Start of larger optional group
-						largerOptionalGrpRegex = subfieldRegex;
-
-					} else if (LeftBracket == null && RightBracket != null) {
-						// End of larger optional group
-						largerOptionalGrpRegex += subfieldRegex;
-						tagRegx += String.format("(?>%s)?", largerOptionalGrpRegex);
-						largerOptionalGrpRegex = "";
-					} else if (LeftBracket == null && RightBracket == null)
-						if (largerOptionalGrpRegex.length() > 0) {
-							// Middle of larger optional group
-							largerOptionalGrpRegex += subfieldRegex;
-						} else {
-							// Single non-optional field
-							tagRegx += subfieldRegex;
-						}
-
-				}
-				tagRegex.put(tag, tagRegx);
-				tagFields.put(tag, fieldList);
+			}
+			tagRegex.put(tag, tagRegx);
+			tagFields.put(tag, fieldList);
 
 //				System.out.println(tag + " ==> " + format + "\n" + "REGEX:" + tagRegx + "\n");
 
-			}
 		}
 
 	}
@@ -213,18 +209,21 @@ public class TagFactory {
 	}
 
 	public Tag createTag(String tag, String content) throws UnknownTagException, MTException {
-		String log = "";
-
 		ArrayList<String> fieldNames = getTagFieldNames(tag);
 		String tagContentRegex = getTagRegex(tag);
 		Pattern tagContentPattern = Pattern.compile(tagContentRegex, Pattern.MULTILINE);
 		Matcher tagContentMatcher = tagContentPattern.matcher(content);
 		ArrayList<String> fieldValues = new ArrayList<String>();
 
-		tagContentMatcher.find();
+		if (!tagContentMatcher.find()) {
+			throw new SyntaxException(tagContentMatcher.pattern().toString(), tag);
+		}
 		String fieldValue;
 		for (String fieldName : fieldNames) {
 			fieldValue = tagContentMatcher.group(fieldName);
+			if (fieldValue == null)
+				fieldValue = "";
+
 			if (fieldName.equals("Amount"))
 				validateAmountField(fieldValue);
 
@@ -279,7 +278,6 @@ public class TagFactory {
 
 	public static void main(String[] args) throws IOException, UnknownTagException, MTException {
 		TagFactory tf = new TagFactory();
-//		tf.createTag("33B", "NOK123456789,123456456987");
 		Tag myTag = tf.createTag("33B", "NOK123456,123");
 		System.out.println(myTag);
 

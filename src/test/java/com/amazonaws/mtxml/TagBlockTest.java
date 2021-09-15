@@ -28,7 +28,7 @@ abstract class TagBlockTest {
 	private static final String testFolderPath = new File("src/test").getAbsolutePath();
 	private static final String testResourcesPath = new File(testFolderPath + "/resources").getAbsolutePath();
 
-	abstract TagBlock createBlock(String content);
+	abstract AbstractBlock createBlock(String content);
 
 	protected static void initValidBlocks(String[] validBlocksInputs) throws IOException {
 		// Read blockdata from csv files
@@ -108,7 +108,7 @@ abstract class TagBlockTest {
 	@ParameterizedTest
 	@MethodSource("blocksWithTags")
 	void testGetTagString(String blockString, ArrayList<String[]> tags) {
-		TagBlock block = createBlock(blockString);
+		AbstractBlock block = createBlock(blockString);
 		for (String[] tagValuePair : tags) {
 			String tag = tagValuePair[0];
 			String tagValue = tagValuePair[1];
@@ -123,7 +123,7 @@ abstract class TagBlockTest {
 	@ParameterizedTest
 	@MethodSource("blocksWithTags")
 	void testGetTagInt(String blockString, ArrayList<String[]> tags) {
-		TagBlock block = createBlock(blockString);
+		AbstractBlock block = createBlock(blockString);
 		for (int index = 0; index < tags.size(); index++) {
 			String[] tagValuePair = tags.get(index);
 			String tagValue = tagValuePair[1];
@@ -139,21 +139,21 @@ abstract class TagBlockTest {
 	@ParameterizedTest
 	@MethodSource("validBlocks")
 	void testGetTagStringNull(String blockContent) {
-		TagBlock block = createBlock(blockContent);
+		AbstractBlock block = createBlock(blockContent);
 		assertThrows(NullPointerException.class, () -> block.getTag(null));
 	}
 
 	@ParameterizedTest
 	@MethodSource("validBlocks")
 	void testGetTagStringEmpty(String blockContent) {
-		TagBlock block = createBlock(blockContent);
+		AbstractBlock block = createBlock(blockContent);
 		assertThrows(IllegalArgumentException.class, () -> block.getTag(""));
 	}
 
 	@ParameterizedTest
 	@MethodSource("validBlocks")
 	void testGetTagIntInvalid(String blockContent) {
-		TagBlock block = createBlock(blockContent);
+		AbstractBlock block = createBlock(blockContent);
 		assertThrows(IndexOutOfBoundsException.class, () -> block.getTag(-3));
 	}
 

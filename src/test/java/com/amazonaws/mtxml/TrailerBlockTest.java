@@ -15,7 +15,7 @@ class TrailerBlockTest extends TagBlockTest {
 	}
 
 	@Override
-	TagBlock createBlock(String content) {
+	AbstractBlock createBlock(String content) {
 		return new TrailerBlock(content);
 	}
 

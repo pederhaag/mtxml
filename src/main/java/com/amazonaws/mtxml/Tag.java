@@ -20,18 +20,36 @@ class Tag implements MTComponent {
 		this.qualifier = qualifier;
 	}
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+	String getFieldValue(String field) {
+		for (int i = 0; i < fieldNames.size(); i++) {
+			if (fieldNames.get(i).equals(field))
+				return fieldValues.get(i);
+		}
+		return null;
 	}
 
 	@Override
 	public String toXml() {
-		// TODO Auto-generated method stub
-		return null;
+		String opening = null;
+
+		if (qualifier == null) {
+			opening = XmlFactory.openNode("Tag" + tagName);
+		} else {
+			opening = XmlFactory.openNode("Tag" + tagName, "Qualifier", qualifier);
+		}
+
+		String content = "";
+		for (int i = 0; i < fieldNames.size(); i++) {
+			content += XmlFactory.writeNode(fieldNames.get(i), fieldValues.get(i));
+		}
+
+		String closing = XmlFactory.closeNode("Tag" + tagName);
+
+		return opening + content + closing;
 	}
 
 	public String toString() {
+		// TODO: Remove this..
 		String s = "Tag: " + tagName;
 		for (int i = 0; i < fieldNames.size(); i++) {
 			s += "\n\t" + fieldNames.get(i) + ": " + fieldValues.get(i);
