@@ -1,26 +1,27 @@
 package com.amazonaws.mtxml;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 class Tag implements MTComponent {
-	private String qualifier;
+//	private String qualifier;
 	private ArrayList<String> fieldNames;
 	private ArrayList<String> fieldValues;
-	private String tagName;
+	private String tag;
 
 	Tag(String tagName, ArrayList<String> fieldNames, ArrayList<String> fieldValues) {
-		this.tagName = tagName;
+		Objects.requireNonNull(fieldNames);
+		Objects.requireNonNull(fieldValues);
+
+		this.tag = tagName;
 		this.fieldNames = fieldNames;
 		this.fieldValues = fieldValues;
 
 	}
 
-	Tag(String tagName, ArrayList<String> fieldNames, ArrayList<String> fieldValues, String qualifier) {
-		this(tagName, fieldNames, fieldValues);
-		this.qualifier = qualifier;
-	}
-
 	String getFieldValue(String field) {
+		if (field.equals("Tag"))
+			return tag;
 		for (int i = 0; i < fieldNames.size(); i++) {
 			if (fieldNames.get(i).equals(field))
 				return fieldValues.get(i);
@@ -31,26 +32,41 @@ class Tag implements MTComponent {
 	@Override
 	public String toXml() {
 		String opening = null;
+		String qualifier = null;
+
+		ArrayList<String> fieldValuesToXml = fieldValues;
+		ArrayList<String> fieldNamesToXml = fieldNames;
+
+		if (fieldNamesToXml.size() > 0) {
+			if (fieldNamesToXml.get(0).equals("Qualifier")) {
+				qualifier = fieldValuesToXml.remove(0);
+				fieldNamesToXml.remove(0);
+
+			}
+
+		}
 
 		if (qualifier == null) {
-			opening = XmlFactory.openNode("Tag" + tagName);
+			opening = XmlFactory.openNode("Tag" + tag);
 		} else {
-			opening = XmlFactory.openNode("Tag" + tagName, "Qualifier", qualifier);
+			opening = XmlFactory.openNode("Tag" + tag, "Qualifier", qualifier);
 		}
 
 		String content = "";
-		for (int i = 0; i < fieldNames.size(); i++) {
-			content += XmlFactory.writeNode(fieldNames.get(i), fieldValues.get(i));
+
+		for (int i = 0; i < fieldNamesToXml.size(); i++) {
+
+			content += XmlFactory.writeNode(fieldNamesToXml.get(i), fieldValuesToXml.get(i));
 		}
 
-		String closing = XmlFactory.closeNode("Tag" + tagName);
+		String closing = XmlFactory.closeNode("Tag" + tag);
 
 		return opening + content + closing;
 	}
 
 	public String toString() {
 		// TODO: Remove this..
-		String s = "Tag: " + tagName;
+		String s = "Tag: " + tag;
 		for (int i = 0; i < fieldNames.size(); i++) {
 			s += "\n\t" + fieldNames.get(i) + ": " + fieldValues.get(i);
 		}
