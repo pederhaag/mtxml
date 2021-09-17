@@ -21,7 +21,7 @@ import de.siegmar.fastcsv.reader.CsvRow;
 import de.siegmar.fastcsv.reader.CsvReader.CsvReaderBuilder;
 
 abstract class TagBlockTest {
-	protected static Map<String, ArrayList<String[]>> validBlocks = new HashMap<String, ArrayList<String[]>>();
+	protected static Map<String, ArrayList<String[]>> validBlocks;
 	protected static String[] invalidBlocks;
 	protected static String blockIdentifier;
 
@@ -31,6 +31,7 @@ abstract class TagBlockTest {
 	abstract AbstractBlock createBlock(String content);
 
 	protected static void initValidBlocks(String[] validBlocksInputs) throws IOException {
+		validBlocks = new HashMap<String, ArrayList<String[]>>();
 		// Read blockdata from csv files
 		for (String testcase : validBlocksInputs) {
 			String filepath = testResourcesPath + "/" + testcase;

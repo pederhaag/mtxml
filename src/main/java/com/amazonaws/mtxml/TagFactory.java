@@ -45,7 +45,8 @@ public class TagFactory {
 		charsetsPatterns.put("d", "[0-9,]");
 
 		// SWIFT Charactersets
-		charsetsPatterns.put("x", "[a-zA-Z0-9\\/\\-?:().,'+ \\n]");
+		charsetsPatterns.put("x", "[a-zA-Z0-9\\/\\-?:().,'+ ]");
+//		charsetsPatterns.put("x", "[a-zA-Z0-9\\/\\-?:().,'+ \\n]");
 		charsetsPatterns.put("y", "[A-Z0-9\\/\\-?:().,'+=!\\\"%&*<>; ]");
 		charsetsPatterns.put("z", "[a-zA-Z0-9\\/\\-?:().,'+=!\\\"%&*<>;{@#_ \\r\\n]");
 
@@ -290,10 +291,11 @@ public class TagFactory {
 
 	public static void main(String[] args) throws IOException, UnknownTagException, MTException {
 		TagFactory tf = new TagFactory();
-		System.out.println(tf.getTagRegex("11A"));
-		String content = ":TANH//STK";
+		System.out.println(tf.getTagRegex("50K"));
+		String content = "/NV4906448882251\\nBajjwstoxlmcnuti\\nJauxqn BIIs wget 0\\nOpssgzns 2732 bizg\\n0321 Hsxd".replace("\\n", "\n");
+		System.out.println(content);
 //		System.out.println(tf.createTag("11A", ":TANH//STK").getFieldValue("Qualifier"));
-		System.out.println(tf.createTag("17B", ":IMNI//I").getFieldValue("Qualifier"));
+		System.out.println(tf.createTag("50K", content));
 
 	}
 

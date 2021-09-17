@@ -1,7 +1,6 @@
 package com.amazonaws.mtxml;
 
 public class XmlFactory {
-	private static final String[][] EMPTY_ARRAY = new String[0][0];
 	private static final String XML_DECLARATION_TEMPLATE = "<?xml version=\"%s\" encoding=\"%s\" ?>";
 	private static final String DEFAULT_XML_VERSION = "1.0";
 	private static final String DEFAULT_XML_ENCODING = "UTF-8";

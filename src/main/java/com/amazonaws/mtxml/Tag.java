@@ -56,7 +56,18 @@ class Tag implements MTComponent {
 
 		for (int i = 0; i < fieldNamesToXml.size(); i++) {
 
-			content += XmlFactory.writeNode(fieldNamesToXml.get(i), fieldValuesToXml.get(i));
+			String fieldValue = fieldValuesToXml.get(i);
+			String fieldName = fieldNamesToXml.get(i);
+			
+			if (fieldValue.contains("\n")) {
+				content += XmlFactory.openNode(fieldName);
+				for (String line : fieldValue.split("\n")) {
+					content += XmlFactory.writeNode("Line", line);
+				}
+				content += XmlFactory.closeNode(fieldName);
+			} else {
+				content += XmlFactory.writeNode(fieldName, fieldValue);
+			}
 		}
 
 		String closing = XmlFactory.closeNode("Tag" + tag);
@@ -65,7 +76,6 @@ class Tag implements MTComponent {
 	}
 
 	public String toString() {
-		// TODO: Remove this..
 		String s = "Tag: " + tag;
 		for (int i = 0; i < fieldNames.size(); i++) {
 			s += "\n\t" + fieldNames.get(i) + ": " + fieldValues.get(i);

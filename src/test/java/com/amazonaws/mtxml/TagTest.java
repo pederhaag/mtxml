@@ -119,6 +119,9 @@ class TagTest {
 	void testGetFieldValue(Map<String, String> tagData) throws UnknownTagException, MTException {
 		String rawTagContent = tagData.get("RawContent");
 		Tag tag = factory.createTag(tagData.get("Tag"), rawTagContent.replace("\\n", "\n"));
+		if (tag.equals("50K")) {
+			System.out.println("hei");
+		}
 
 		for (String field : tagData.keySet()) {
 			if (!field.equals("RawContent")) {
