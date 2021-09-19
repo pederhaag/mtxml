@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,17 +18,15 @@ public class TextBlock implements MTComponent {
 	private final TagFactory factory;
 	private ArrayList<MTComponent> components = new ArrayList<MTComponent>();
 
-	TextBlock(String content) throws IOException, UnknownTagException, MTException {
+	TextBlock(String content) throws IOException, UnknownTagException {
 		factory = new TagFactory();
 
-		if (content == null) {
-			throw new NullPointerException("Argument cannot be null.");
-		}
+		Objects.requireNonNull(content, "Tagcontent cannot be null");
 		Pattern pattern = Pattern.compile(REGEX_PATTERN_TEXTBLOCK, Pattern.MULTILINE);
 		Matcher matcher = pattern.matcher(content);
 
 		if (!matcher.find()) {
-			throw new SyntaxException(REGEX_PATTERN_TEXTBLOCK, content);
+			throw new MTSyntaxException(REGEX_PATTERN_TEXTBLOCK, content);
 		}
 		RawData = matcher.group("TagContent");
 

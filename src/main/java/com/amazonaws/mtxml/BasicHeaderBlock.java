@@ -2,12 +2,22 @@ package com.amazonaws.mtxml;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/*
+ * Class for modelling the basic headerblock in a MT message
+ */
 public class BasicHeaderBlock implements MTComponent {
-	private final static String regexPattern = "\\{(1):([A-Z])(0\\d|\\d{2})([A-Z]{12})(\\d{4})(\\d{6})\\}";
+	/**
+	 * Regex pattern for identyfying the elements in the basic headerblock
+	 */
+	private final static String REGEX_PATTERN = "\\{(?<BlockIdentifier>1):(?<AppID>[A-Z])(?<ServiceID>0\\d|\\d{2})(?<LTAdress>[A-Z]{12})(?<SessionNumber>\\d{4})(?<SequenceNumber>\\d{6})\\}";
 
+	/*
+	 * Container for the tags
+	 */
 	private Map<String, String> data = new HashMap<String, String>();
 
 	private void initMaps() {
@@ -21,29 +31,36 @@ public class BasicHeaderBlock implements MTComponent {
 	}
 
 	BasicHeaderBlock(String content) {
-		if (content == null) {
-			throw new NullPointerException("Argument cannot be null.");
-		}
-		
+		Objects.requireNonNull(content, "Blockcontent cannot be null");
+
 		initMaps();
 
-		Pattern pattern = Pattern.compile(regexPattern);
+		// Match the block
+		Pattern pattern = Pattern.compile(REGEX_PATTERN);
 		Matcher matcher = pattern.matcher(content);
 
 		if (!matcher.find()) {
-			throw new SyntaxException(regexPattern, content);
+			throw new MTSyntaxException(REGEX_PATTERN, content);
 		}
 
-		setData(data, "BlockIdentifier", matcher.group(1));
-		setData(data, "AppID", matcher.group(2));
-		setData(data, "ServiceID", matcher.group(3));
-		setData(data, "LTAdress", matcher.group(4));
-		setData(data, "SessionNumber", matcher.group(5));
-		setData(data, "SequenceNumber", matcher.group(6));
+		// Add found datafields
+		setData(data, "BlockIdentifier", matcher.group("BlockIdentifier"));
+		setData(data, "AppID", matcher.group("AppID"));
+		setData(data, "ServiceID", matcher.group("ServiceID"));
+		setData(data, "LTAdress", matcher.group("LTAdress"));
+		setData(data, "SessionNumber", matcher.group("SessionNumber"));
+		setData(data, "SequenceNumber", matcher.group("SequenceNumber"));
 		setData(data, "RawData", content);
 
 	}
 
+	/**
+	 * Wrapper for adding found value pairs into container
+	 * 
+	 * @param container Container to put the data in
+	 * @param key       Fieldname
+	 * @param value     Value of the field
+	 */
 	private void setData(Map<String, String> container, String key, String value) {
 		if (!data.containsKey(key)) {
 			String msg = String.format("Container does not contain key '%s'.", key);
@@ -53,6 +70,12 @@ public class BasicHeaderBlock implements MTComponent {
 
 	}
 
+	/**
+	 * Generalized getter for the different fields.
+	 * 
+	 * @param field Field to get
+	 * @return Value of said field
+	 */
 	public String getData(String field) {
 		if (!data.containsKey(field)) {
 			String msg = String.format("Invalid field '%s'.", field);
@@ -61,20 +84,23 @@ public class BasicHeaderBlock implements MTComponent {
 		return data.get(field);
 	}
 
-//	public static void main(String[] args) {
-//		BasicHeaderBlock block = new BasicHeaderBlock("{1:F01MYBABBICAXXX0878450607}");
-//		System.out.println("ApplicationIdentifier: " + block.AppID);
-//		System.out.println("ServiceID: " + block.ServiceID);
-//		System.out.println("LTAdress: " + block.LTAdress);
-//		System.out.println("SessionNumber: " + block.SessionNumber);
-//		System.out.println("SequenceNumber: " + block.SequenceNumber);
-//
-//	}
+	/**
+	 * Return a list of valid fields
+	 */
+	public String[] validFields() {
+		return (String[]) data.keySet().toArray();
+	}
 
 	@Override
 	public String toXml() {
-		// TODO Auto-generated method stub
-		return null;
+		String xml = XmlFactory.openNode("BasicHeaderBlock");
+		xml += XmlFactory.writeNode("AppID", data.get("AppID"));
+		xml += XmlFactory.writeNode("ServiceID", data.get("ServiceID"));
+		xml += XmlFactory.writeNode("LTAdress", data.get("LTAdress"));
+		xml += XmlFactory.writeNode("SessionNumber", data.get("SessionNumber"));
+		xml += XmlFactory.writeNode("SequenceNumber", data.get("SequenceNumber"));
+		xml += XmlFactory.closeNode("BasicHeaderBlock");
+		return xml;
 	}
 
 }

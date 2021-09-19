@@ -1,14 +1,19 @@
 package com.amazonaws.mtxml;
 
-public class HeaderTag {
+import java.util.Objects;
+
+/*
+ * Class for modelling the individual tags in headers of the form {@code {t_i:v_i}}
+ * occurring in {@code TrailerHeaderBlock} and {@code UserHeaderBlock} classes
+ */
+class HeaderTag {
 	final String tag;
 	final String value;
 
 	HeaderTag(String tag, String value) {
-		if (tag == null || value == null) {
-			String msg = String.format("Tag (%s) and value (%s) must be non-null", tag, value);
-			throw new NullPointerException(msg);
-		}
+		Objects.requireNonNull(tag, "Tag cannot be null");
+		Objects.requireNonNull(value, "Tagvalue cannot be null");
+
 		if (tag.equals("")) {
 			String msg = String.format("Tag (%s) must be non-empty", tag, value);
 			throw new IllegalArgumentException(msg);
@@ -16,7 +21,6 @@ public class HeaderTag {
 
 		this.tag = tag;
 		this.value = value;
-
 	}
 
 }

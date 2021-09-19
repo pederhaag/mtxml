@@ -44,7 +44,7 @@ public class ApplicationHeaderBlockTest {
 	@ParameterizedTest
 	@ValueSource(strings = { invalidOutputBlock1, invalidOutputBlock2, invalidInputBlock1, invalidInputBlock2 })
 	void testApplicationHeaderBlockInvalid(String input) {
-		assertThrows(SyntaxException.class, () -> new ApplicationHeaderBlock(input));
+		assertThrows(MTSyntaxException.class, () -> new ApplicationHeaderBlock(input));
 	}
 
 	/*

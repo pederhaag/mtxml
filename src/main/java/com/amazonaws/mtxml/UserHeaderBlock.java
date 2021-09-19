@@ -9,4 +9,8 @@ public class UserHeaderBlock extends AbstractBlock implements MTComponent {
 		super(content, "3");
 	}
 
+	@Override
+	String getXmlNodeName() {
+		return "UserHeaderBlock";
+	}
 }

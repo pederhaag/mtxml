@@ -76,7 +76,7 @@ abstract class TagBlockTest {
 	@ParameterizedTest
 	@MethodSource("invalidBlocks")
 	void testBlockInvalid(String block) {
-		assertThrows(SyntaxException.class, () -> createBlock(block));
+		assertThrows(MTSyntaxException.class, () -> createBlock(block));
 	}
 
 	private static Stream<String> invalidBlocks() {

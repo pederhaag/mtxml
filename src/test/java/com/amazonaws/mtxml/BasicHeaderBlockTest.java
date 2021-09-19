@@ -34,7 +34,7 @@ public class BasicHeaderBlockTest {
 	@ValueSource(strings = { "{2:F01MYBABBICAXXX0878450607}", "{1:F01MYBABBICAXXX08784506078}",
 			"{1:F01MYBABBICAXXX08S8450607}" })
 	void testBasicHeaderBlockInvalid(String input) {
-		assertThrows(SyntaxException.class, () -> new BasicHeaderBlock(input));
+		assertThrows(MTSyntaxException.class, () -> new BasicHeaderBlock(input));
 	}
 
 	/*

@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,73 +15,119 @@ import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.reader.CsvRow;
 import de.siegmar.fastcsv.reader.CsvReader.CsvReaderBuilder;
 
+/**
+ * {@code TagFactory} is a factory-class for creating {@code Tag}-objects from
+ * raw MT-format.
+ * 
+ * @author peder
+ *
+ */
 public class TagFactory {
-	private final static String resourcesPath = new File("src/main/resources").getAbsolutePath();
-	private final static String tagDefinitionsFilePath = resourcesPath + "/tagDefinitions.txt";
+	/**
+	 * Constants pointing to the tag-definitions file
+	 */
+	private final static String RESOURCE_PATH = new File("src/main/resources").getAbsolutePath();
+	private final static String TAG_DEFINITIONS_PATH = RESOURCE_PATH + "/tagDefinitions.txt";
 
-	private static Map<String, String> charsetsPatterns = new HashMap<String, String>();
-	private final static String fieldDescriptionStructure = "\\((\\w+)\\)";
+	/*
+	 * Mapping for the different charactersets occurring in the MT-standard to
+	 * regex-expressions
+	 */
+	private static final Map<String, String> charsetsPatterns;
+	static {
+		Map<String, String> tempCharsetsPatterns = new HashMap<String, String>();
+		tempCharsetsPatterns.put("n", "\\d");
+		tempCharsetsPatterns.put("a", "[A-Z]");
+		tempCharsetsPatterns.put("c", "[A-Z0-9]");
+		tempCharsetsPatterns.put("h", "[A-F0-9]");
+		tempCharsetsPatterns.put("d", "[0-9,]");
 
+		// SWIFT Character-sets
+		tempCharsetsPatterns.put("x", "[a-zA-Z0-9\\/\\-?:().,'+ ]");
+//		charsetsPatterns.put("x", "[a-zA-Z0-9\\/\\-?:().,'+ \\n]");
+		tempCharsetsPatterns.put("y", "[A-Z0-9\\/\\-?:().,'+=!\\\"%&*<>; ]");
+		tempCharsetsPatterns.put("z", "[a-zA-Z0-9\\/\\-?:().,'+=!\\\"%&*<>;{@#_ \\r\\n]");
+		charsetsPatterns = tempCharsetsPatterns;
+	}
+
+	/*
+	 * Regex for identifying the different field-names in the tag-definitions
+	 */
+	private final static String REGEX_FIELD_DESCRIPTION = "\\((\\w+)\\)";
+
+	/**
+	 * Mapping from tag (f. ex "19A") to an {@code ArrayList<String>} containing the
+	 * fieldnames
+	 */
 	private static Map<String, ArrayList<String>> tagFields = new HashMap<String, ArrayList<String>>();
-	public static Map<String, String> tagFieldsCharsets = new HashMap<String, String>();
+
+	/**
+	 * Mapping of fieldnames to corresponding regex charactersets
+	 */
+	private static Map<String, String> tagFieldsCharsets = new HashMap<String, String>();
+
+	/*
+	 * Mapping of tag to regex-representation of the tag
+	 */
 	private static Map<String, String> tagRegex = new HashMap<String, String>();
 
+	/*
+	 * This regex parses identifies the different components of MT-standard format
+	 * of a tag
+	 */
+	private static final String REGEX_TAG_INFO = "(?<BracketPrefix>\\[)?(?<Prefix>(?>[/A-Z :,])*)(?>(?<NewLine>\\\\n)|(?<UTCInd>\\[N\\]2!n\\[2!n\\])|(?<Length>\\d+(?>\\-\\d+|!|\\*\\d+)?)(?<Charset>n|a|h|x|y|z|c|d)|(?<Static>[^\\[\\]]))(?<Suffix>/*)(?<BracketSuffix>\\])?";
+
 	public TagFactory() throws IOException {
-		initCharsets();
+//		initCharsets();
 		try {
 			loadTagDefinitions();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		int sink = 1;
-//		buildFieldRegex(":4!c/[8c]/30x", "(Qualifier)(DataSourceScheme)(InstrumentCodeOrDescription)");
 	}
 
-	private void initCharsets() {
-		charsetsPatterns.put("n", "\\d");
-		charsetsPatterns.put("a", "[A-Z]");
-		charsetsPatterns.put("c", "[A-Z0-9]");
-		charsetsPatterns.put("h", "[A-F0-9]");
-		charsetsPatterns.put("d", "[0-9,]");
-
-		// SWIFT Charactersets
-		charsetsPatterns.put("x", "[a-zA-Z0-9\\/\\-?:().,'+ ]");
-//		charsetsPatterns.put("x", "[a-zA-Z0-9\\/\\-?:().,'+ \\n]");
-		charsetsPatterns.put("y", "[A-Z0-9\\/\\-?:().,'+=!\\\"%&*<>; ]");
-		charsetsPatterns.put("z", "[a-zA-Z0-9\\/\\-?:().,'+=!\\\"%&*<>;{@#_ \\r\\n]");
-
-	}
-
-	private void loadTagDefinitions() throws Exception {
-
+	/**
+	 * Read the tag-definitions file and parse the MT-syntax to a regex-based format
+	 * and populate the corresponding maps
+	 * 
+	 * @throws IOException If tag-definitions file cannot be found.
+	 * @throws Exception   If there is an issure parsing a tag-definition
+	 */
+	private void loadTagDefinitions() throws IOException, Exception {
+		// Objects for reading file
 		CsvReaderBuilder builder = CsvReader.builder().commentStrategy(CommentStrategy.SKIP).fieldSeparator('\t');
-		CsvReader reader = builder.build(new File(tagDefinitionsFilePath).toPath(), Charset.defaultCharset());
+		CsvReader reader = builder.build(new File(TAG_DEFINITIONS_PATH).toPath(), Charset.defaultCharset());
 
-		Pattern fieldDescriptionPattern = Pattern.compile(fieldDescriptionStructure, Pattern.MULTILINE);
-		Matcher fieldDescriptionMatcher;
+		// Tools for getting field-names
+		Pattern fieldNamePattern = Pattern.compile(REGEX_FIELD_DESCRIPTION, Pattern.MULTILINE);
+		Matcher fieldNameMatcher;
 
-		Pattern tagInfoPattern = Pattern.compile(
-				"(?<BracketPrefix>\\[)?(?<Prefix>(?>[/A-Z :,])*)(?>(?<NewLine>\\\\n)|(?<UTCInd>\\[N\\]2!n\\[2!n\\])|(?<Length>\\d+(?>\\-\\d+|!|\\*\\d+)?)(?<Charset>n|a|h|x|y|z|c|d)|(?<Static>[^\\[\\]]))(?<Suffix>/*)(?<BracketSuffix>\\])?");
-
+		// Tools for identifying tag-characteristics
+		Pattern tagInfoPattern = Pattern.compile(REGEX_TAG_INFO);
 		Matcher tagInfoMatcher;
 
+		// Process each tag-definition
 		for (CsvRow row : reader) {
 			String tag = row.getField(0);
 			String format = row.getField(1);
 			String formatinfo = row.getField(2);
 
 			tagInfoMatcher = tagInfoPattern.matcher(format);
-			fieldDescriptionMatcher = fieldDescriptionPattern.matcher(formatinfo);
+			fieldNameMatcher = fieldNamePattern.matcher(formatinfo);
+
+			// Parsing tools
 			String tagRegx = "";
 			ArrayList<String> fieldList = new ArrayList<String>();
 			String largerOptionalGrpRegex = "";
 
+			// While there exists more fields
 			while (tagInfoMatcher.find()) {
 				String fieldName = null;
 				if (tagInfoMatcher.group("NewLine") == null) {
-					fieldDescriptionMatcher.find();
-					fieldName = fieldDescriptionMatcher.group(1);
+					// If we have come to an actual field (not just a single newline caught by the
+					// regex) update the field-to-charactersets mapping
+					fieldNameMatcher.find();
+					fieldName = fieldNameMatcher.group(1);
 					fieldList.add(fieldName);
 					tagFieldsCharsets.put(tag + ":" + fieldName, tagInfoMatcher.group("Charset"));
 				}
@@ -88,6 +135,8 @@ public class TagFactory {
 				String LeftBracket = tagInfoMatcher.group("BracketPrefix");
 				String RightBracket = tagInfoMatcher.group("BracketSuffix");
 				String subfieldRegex = createFieldRegex(tagInfoMatcher, fieldName);
+				// We need to handle fields differently based on it is optional and its
+				// neighbours are also part of the same optional group
 				if (LeftBracket != null && RightBracket != null) {
 					// Individual optional tag
 					tagRegx += String.format("(?>%s)?", subfieldRegex);
@@ -118,7 +167,10 @@ public class TagFactory {
 
 	}
 
-	public static String getRegexQuantifier(String desc) throws Exception {
+	/*
+	 * Translate quantifiers used in MT-Standard to regex-versions
+	 */
+	private static String getRegexQuantifier(String desc) throws Exception {
 		int i = desc.indexOf('-');
 		if (i > 0) {
 			String from = desc.substring(0, i);
@@ -127,6 +179,7 @@ public class TagFactory {
 		}
 		i = desc.indexOf('*');
 		if (i > 0) {
+			// This multiline case is handled by itself in createFieldRegex-method
 			throw new Exception("getRegexQuantifier should not be called with '*' as argument.");
 		}
 		i = desc.indexOf('!');
@@ -137,7 +190,10 @@ public class TagFactory {
 		return String.format("{%s,%s}", 0, desc);
 	}
 
-	public static String createFieldRegex(Matcher tagInfoMatcher, String fieldName) throws Exception {
+	/*
+	 * TODO: We are here.
+	 */
+	private static String createFieldRegex(Matcher tagInfoMatcher, String fieldName) throws Exception {
 		String Prefix = regexExcape(tagInfoMatcher.group("Prefix"));
 		String length = tagInfoMatcher.group("Length");
 		String Charset = tagInfoMatcher.group("Charset");
@@ -216,7 +272,10 @@ public class TagFactory {
 
 	}
 
-	public Tag createTag(String tag, String content) throws UnknownTagException, MTException {
+	public Tag createTag(String tag, String content) throws UnknownTagException {
+		Objects.requireNonNull(tag, "Tag cannot be null");
+		Objects.requireNonNull(content, "Tagcontent cannot be null");
+
 		ArrayList<String> fieldNames = getTagFieldNames(tag);
 		String tagContentRegex = getTagRegex(tag);
 		Pattern tagContentPattern = Pattern.compile(tagContentRegex, Pattern.MULTILINE);
@@ -224,10 +283,10 @@ public class TagFactory {
 		ArrayList<String> fieldValues = new ArrayList<String>();
 
 		if (!tagContentMatcher.find()) {
-			throw new SyntaxException(tagContentMatcher.pattern().toString(), tag);
+			throw new MTSyntaxException(tagContentMatcher.pattern().toString(), tag);
 		}
 		if (tagContentMatcher.start() > 0)
-			throw new SyntaxException(tagContentMatcher.pattern().toString(), tag);
+			throw new MTSyntaxException(tagContentMatcher.pattern().toString(), tag);
 
 		String fieldValue;
 		for (String fieldName : fieldNames) {
@@ -235,32 +294,24 @@ public class TagFactory {
 			if (fieldValue == null)
 				fieldValue = "";
 
-			if (fieldName.equals("Amount"))
-				validateAmountField(fieldValue);
+			if (Tag.isNumericField(fieldName))
+				validateNumericField(fieldValue);
 
 			fieldValues.add(fieldValue);
-//			System.out.println(fieldName + " = " + fieldValue);
 
 		}
-		int noOverrunChars = content.length() - tagContentMatcher.end() - (tag.length() + 2);
+
+		int noOverrunChars = content.length() - tagContentMatcher.end();
 		if (noOverrunChars > 0) {
 			System.out.println(String.format(
 					"[Warning] FieldOverrunError: An additional %d characters could not be successfully be treated as part of any subfield in tag %s.",
 					noOverrunChars, tag));
 		}
-
-//		if (fieldNames.get(0).equals("Qualifier")) {
-//			String qualifier = fieldValues.remove(0);
-//			fieldNames.remove(0);
-//			return new Tag(tag, fieldNames, fieldValues, qualifier);
-//		} else {
-//			return new Tag(tag, fieldNames, fieldValues);
-//		}
 		return new Tag(tag, fieldNames, fieldValues);
 
 	}
 
-	private void validateAmountField(String value) throws SyntaxException {
+	private void validateNumericField(String value) throws MTSyntaxException {
 		String error = null;
 		int commaIx = value.indexOf(',');
 		if (commaIx == -1) {
@@ -271,7 +322,7 @@ public class TagFactory {
 			error = "Malformed amount field: Multiple commas in field";
 		}
 		if (error != null) {
-			throw new SyntaxException(error);
+			throw new MTSyntaxException(error);
 		}
 	}
 
@@ -289,13 +340,9 @@ public class TagFactory {
 		throw new UnknownTagException(tag);
 	}
 
-	public static void main(String[] args) throws IOException, UnknownTagException, MTException {
+	public static void main(String[] args) throws IOException, UnknownTagException {
 		TagFactory tf = new TagFactory();
-		System.out.println(tf.getTagRegex("50K"));
-		String content = "/NV4906448882251\\nBajjwstoxlmcnuti\\nJauxqn BIIs wget 0\\nOpssgzns 2732 bizg\\n0321 Hsxd".replace("\\n", "\n");
-		System.out.println(content);
-//		System.out.println(tf.createTag("11A", ":TANH//STK").getFieldValue("Qualifier"));
-		System.out.println(tf.createTag("50K", content));
+		System.out.println(tf.createTag("15A", "TEST"));
 
 	}
 

@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.xmlunit.assertj3.XmlAssert;
 
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.reader.CsvRow;
@@ -30,7 +32,6 @@ class TagTest {
 	static ArrayList<Map<String, String>> validTagsWithQualifier = new ArrayList<Map<String, String>>();
 	static ArrayList<Map<String, String>> validTagsWithoutQualifier = new ArrayList<Map<String, String>>();
 	static ArrayList<Map<String, String>> validTags = new ArrayList<Map<String, String>>();
-	private final static String[] numberFields = new String[] { "Amount", "Quantity", "Rate", "Price", "Balance" };
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
@@ -48,7 +49,6 @@ class TagTest {
 			boolean hasQualifier;
 
 			Map<String, String> tagData = new HashMap<String, String>();
-//			String tag
 			tagData.put("RawContent", rawData.substring(tag.length() + 2));
 			tagData.put("Tag", tag);
 			for (CsvRow fieldRow : fieldReader) {
@@ -56,9 +56,7 @@ class TagTest {
 				// Get values of subfields
 				for (String valuePair : fieldRow.getFields()) {
 					String fieldName = valuePair.substring(0, valuePair.indexOf('='));
-//					String tagName = fieldName.split("Field")[1];
 					String fieldValue = valuePair.substring(valuePair.indexOf('=') + 1);
-//					System.out.println(valuePair);
 					tagData.put(fieldName, fieldValue);
 				}
 				hasQualifier = tagData.containsKey("Qualifier");
@@ -77,58 +75,32 @@ class TagTest {
 
 	@ParameterizedTest
 	@MethodSource("validTags")
-	void testTag(Map<String, String> tagData) throws UnknownTagException, MTException {
+	void testTag(Map<String, String> tagData) throws UnknownTagException {
 		String rawTagContent = tagData.get("RawContent");
-		Tag tag = factory.createTag(tagData.get("Tag"), rawTagContent.replace("\\n", "\n"));
+		factory.createTag(tagData.get("Tag"), rawTagContent.replace("\\n", "\n"));
 	}
 
-	private static Stream<Map<String, String>> validTagsWithoutQualifier() {
-		return validTagsWithoutQualifier.stream();
+	@ParameterizedTest
+	@MethodSource("SyntaxExceptions")
+	void testTagSyntaxExceptions(String tag, String content) throws UnknownTagException {
+		assertThrows(MTSyntaxException.class, () -> factory.createTag(tag, content));
 	}
 
-	private static Stream<Map<String, String>> validTagsWithQualifier() {
-		return validTagsWithQualifier.stream();
-	}
-
-	private static Stream<Map<String, String>> validTags() {
-		return validTags.stream();
-	}
-
-	private static boolean isNumberField(String fieldName) {
-		for (String numberField : numberFields) {
-			if (fieldName.equals(numberField))
-				return true;
-		}
-		return false;
-	}
-
-	private static Stream<Arguments> validTagsWithNumbers() {
-		Stream.Builder<Arguments> builder = Stream.builder();
-//        int tagNo = 0;
-		for (int tagNo = 0; tagNo < validTags.size(); tagNo++) {
-			builder.add(Arguments.of(tagNo, validTags.get(tagNo)));
-		}
-//        for (Map<String, String> tagData : validTags) {
-//        	
-//        }
-		return builder.build();
+	@ParameterizedTest
+	@MethodSource("UnknownTags")
+	void testTagSyntaxExceptions(String tag) throws UnknownTagException {
+		assertThrows(UnknownTagException.class, () -> factory.createTag(tag, "Somethingsomething"));
 	}
 
 	@ParameterizedTest
 	@MethodSource("validTags")
-	void testGetFieldValue(Map<String, String> tagData) throws UnknownTagException, MTException {
+	void testGetFieldValue(Map<String, String> tagData) throws UnknownTagException {
 		String rawTagContent = tagData.get("RawContent");
 		Tag tag = factory.createTag(tagData.get("Tag"), rawTagContent.replace("\\n", "\n"));
-		if (tag.equals("50K")) {
-			System.out.println("hei");
-		}
 
 		for (String field : tagData.keySet()) {
 			if (!field.equals("RawContent")) {
 				String ExpectedValue = tagData.get(field).replace("\\n", "\n");
-				if (isNumberField(field)) {
-					ExpectedValue = ExpectedValue.replace('.', ',');
-				}
 				assertEquals(ExpectedValue, tag.getFieldValue(field),
 						String.format("Expected field '%s' to be equal to %s but got %s instead", field, ExpectedValue,
 								tag.getFieldValue(field)));
@@ -137,9 +109,76 @@ class TagTest {
 
 	}
 
-	@Test
-	void testToXml() {
-		fail("Not yet implemented"); // TODO
+	@ParameterizedTest
+	@MethodSource("validTags")
+	void testToXml(Map<String, String> tagData) throws UnknownTagException {
+		String rawTagContent = tagData.get("RawContent");
+		String tagName = tagData.get("Tag");
+		Tag tag = factory.createTag(tagName, rawTagContent.replace("\\n", "\n"));
+		String testXml = tag.toXml();
+		String controlXml;
+
+		if (tagData.containsKey("Qualifier")) {
+
+			controlXml = XmlFactory.openNode("Tag" + tagName, "Qualifier", tagData.get("Qualifier"));
+		} else {
+			controlXml = XmlFactory.openNode("Tag" + tagName);
+		}
+		for (String field : tagData.keySet()) {
+
+			if (!field.equals("RawContent") && !field.equals("Qualifier") && !field.equals("Tag")) {
+				String fieldContent = tagData.get(field);
+				if (fieldContent.contains("\\n"))
+					fieldContent = MultilineToXml(fieldContent);
+				controlXml += XmlFactory.writeNode(field, fieldContent);
+			}
+		}
+		controlXml += XmlFactory.closeNode("Tag" + tagName);
+
+		XmlAssert.assertThat(testXml).and(controlXml).ignoreChildNodesOrder().areIdentical();
+	}
+
+	/*
+	 * Helper methods
+	 */
+	private static String MultilineToXml(String input) {
+		String output = "";
+		for (String line : input.split("\\\\n")) {
+			output += XmlFactory.writeNode("Line", line);
+		}
+		return output;
+	}
+
+	/*
+	 * Argument providers
+	 */
+	private static Stream<Map<String, String>> validTags() {
+		return validTags.stream();
+	}
+
+	private static Stream<Arguments> SyntaxExceptions() {
+		Stream.Builder<Arguments> builder = Stream.builder();
+
+		builder.add(Arguments.arguments("11A", "123"));
+		builder.add(Arguments.arguments("32E", "ED"));
+		builder.add(Arguments.arguments("32E", "ED"));
+
+		// Invalid numeric fields
+		builder.add(Arguments.arguments("34B", "NOK123."));
+		builder.add(Arguments.arguments("34B", "NOK123,,"));
+		builder.add(Arguments.arguments("34B", "NOK12,3,"));
+		builder.add(Arguments.arguments("34B", "NOK,"));
+
+		return builder.build();
+	}
+
+	private static Stream<String> UnknownTags() {
+		Stream.Builder<String> builder = Stream.builder();
+
+		builder.add("99C");
+		builder.add("91F");
+
+		return builder.build();
 	}
 
 }
