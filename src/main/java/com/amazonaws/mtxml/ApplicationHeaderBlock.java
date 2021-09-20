@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*
+/**
  * Class for modelling the application headerblock in a MT message
  */
 public class ApplicationHeaderBlock implements MTComponent {
@@ -33,7 +33,7 @@ public class ApplicationHeaderBlock implements MTComponent {
 	private Map<String, String> data = new HashMap<String, String>();
 	private Map<String, String> mirData = new HashMap<String, String>();
 
-	/*
+	/**
 	 * Method for defining which subfields to expect
 	 */
 	private void initMaps() {
@@ -71,6 +71,7 @@ public class ApplicationHeaderBlock implements MTComponent {
 
 		// Determine if it is an input or output message
 		if (matcherInput.find()) {
+			// Populate input-data
 			putData(data, "BlockIdentifier", matcherInput.group("BlockIdentifier"));
 			putData(data, "InOutID", matcherInput.group("BlockIdentifier"));
 			putData(data, "MT", matcherInput.group("MT"));
@@ -80,7 +81,7 @@ public class ApplicationHeaderBlock implements MTComponent {
 			putData(data, "ObsolencePeriod", matcherInput.group("ObsolencePeriod"));
 
 		} else if (matcherOutput.find()) {
-
+			// Populate output-data
 			putData(data, "BlockIdentifier", matcherOutput.group("BlockIdentifier"));
 			putData(data, "InOutID", matcherOutput.group("InOutID"));
 			putData(data, "MT", matcherOutput.group("MT"));
@@ -90,6 +91,7 @@ public class ApplicationHeaderBlock implements MTComponent {
 			putData(data, "OutputTime", matcherOutput.group("OutputTime"));
 			putData(data, "Priority", matcherOutput.group("Priority"));
 
+			// Additional details on the MIR
 			Matcher matcherMIR = Pattern.compile(REGEX_MIR).matcher(getData("MIR"));
 			if (!matcherMIR.find()) {
 				throw new MTSyntaxException(REGEX_MIR, content);

@@ -15,7 +15,7 @@ public class BasicHeaderBlock implements MTComponent {
 	 */
 	private final static String REGEX_PATTERN = "\\{(?<BlockIdentifier>1):(?<AppID>[A-Z])(?<ServiceID>0\\d|\\d{2})(?<LTAdress>[A-Z]{12})(?<SessionNumber>\\d{4})(?<SequenceNumber>\\d{6})\\}";
 
-	/*
+	/**
 	 * Container for the tags
 	 */
 	private Map<String, String> data = new HashMap<String, String>();

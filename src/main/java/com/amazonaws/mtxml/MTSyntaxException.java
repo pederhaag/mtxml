@@ -1,6 +1,6 @@
 package com.amazonaws.mtxml;
 
-/*
+/**
  * 
  * {@code MTSyntaxException} is an exception indicating that an input
  * does not confirm to a predefined format and is therefore invalid

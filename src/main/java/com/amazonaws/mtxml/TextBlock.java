@@ -11,27 +11,49 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 
+ * This class models the Textblock of a MT message
+ *
+ */
 public class TextBlock implements MTComponent {
+	/**
+	 * Regex for matching the textblock content
+	 */
 	private final static String REGEX_PATTERN_TEXTBLOCK = "\\{4:\\r?\\n(?<TagContent>(?>.|\\r|\\n)*)\\n-\\}$";
+
+	/**
+	 * Regex for matching the different tags and their contents
+	 */
 	private final static String REGEX_PATTERN_TAGS = ":(?<Tag>[\\dA-Z]+):(?<Content>(?>:)?(?>.|\\n)*?(?=\\n:|\\n-\\}))";
-	private final String RawData;
+
+	/**
+	 * Factory for creating the different tags
+	 */
 	private final TagFactory factory;
+
+	/**
+	 * Container for the subcompoentns of the textblock, i.e. tags and tagblocks
+	 */
 	private ArrayList<MTComponent> components = new ArrayList<MTComponent>();
 
 	TextBlock(String content) throws IOException, UnknownTagException {
 		factory = new TagFactory();
 
-		Objects.requireNonNull(content, "Tagcontent cannot be null");
+		// Get the block content
+		Objects.requireNonNull(content, "Block content cannot be null");
 		Pattern pattern = Pattern.compile(REGEX_PATTERN_TEXTBLOCK, Pattern.MULTILINE);
 		Matcher matcher = pattern.matcher(content);
 
+		// Make sure that the syntax is correct
 		if (!matcher.find()) {
 			throw new MTSyntaxException(REGEX_PATTERN_TEXTBLOCK, content);
 		}
-		RawData = matcher.group("TagContent");
 
+		// Loop through the tags/blocks
 		Pattern patternTags = Pattern.compile(REGEX_PATTERN_TAGS, Pattern.MULTILINE);
 		Matcher matcherTags = patternTags.matcher(content);
+		// This container is used see at which dept the loop is currently working on
 		ArrayList<TagBlock> openBlocks = new ArrayList<TagBlock>();
 		while (matcherTags.find()) {
 			String tagName = matcherTags.group("Tag");
@@ -71,16 +93,16 @@ public class TextBlock implements MTComponent {
 
 	@Override
 	public String toXml() {
-		String opening = XmlFactory.openNode("TextBlock");
+		String xmlOpening = XmlFactory.openNode("TextBlock");
 
-		String content = "";
+		String xmlChildren = "";
 		for (MTComponent c : components) {
-			content += c.toXml();
+			xmlChildren += c.toXml();
 		}
 
-		String closing = XmlFactory.closeNode("TextBlock");
+		String xmlClosing = XmlFactory.closeNode("TextBlock");
 
-		return opening + content + closing;
+		return xmlOpening + xmlChildren + xmlClosing;
 	}
 
 	public static void main(String[] args) throws Exception {

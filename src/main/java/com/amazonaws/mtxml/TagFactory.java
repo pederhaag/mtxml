@@ -29,28 +29,13 @@ public class TagFactory {
 	private final static String RESOURCE_PATH = new File("src/main/resources").getAbsolutePath();
 	private final static String TAG_DEFINITIONS_PATH = RESOURCE_PATH + "/tagDefinitions.txt";
 
-	/*
+	/**
 	 * Mapping for the different charactersets occurring in the MT-standard to
 	 * regex-expressions
 	 */
 	private static final Map<String, String> charsetsPatterns;
-	static {
-		Map<String, String> tempCharsetsPatterns = new HashMap<String, String>();
-		tempCharsetsPatterns.put("n", "\\d");
-		tempCharsetsPatterns.put("a", "[A-Z]");
-		tempCharsetsPatterns.put("c", "[A-Z0-9]");
-		tempCharsetsPatterns.put("h", "[A-F0-9]");
-		tempCharsetsPatterns.put("d", "[0-9,]");
 
-		// SWIFT Character-sets
-		tempCharsetsPatterns.put("x", "[a-zA-Z0-9\\/\\-?:().,'+ ]");
-//		charsetsPatterns.put("x", "[a-zA-Z0-9\\/\\-?:().,'+ \\n]");
-		tempCharsetsPatterns.put("y", "[A-Z0-9\\/\\-?:().,'+=!\\\"%&*<>; ]");
-		tempCharsetsPatterns.put("z", "[a-zA-Z0-9\\/\\-?:().,'+=!\\\"%&*<>;{@#_ \\r\\n]");
-		charsetsPatterns = tempCharsetsPatterns;
-	}
-
-	/*
+	/**
 	 * Regex for identifying the different field-names in the tag-definitions
 	 */
 	private final static String REGEX_FIELD_DESCRIPTION = "\\((\\w+)\\)";
@@ -66,19 +51,36 @@ public class TagFactory {
 	 */
 	private static Map<String, String> tagFieldsCharsets = new HashMap<String, String>();
 
-	/*
+	/**
 	 * Mapping of tag to regex-representation of the tag
 	 */
 	private static Map<String, String> tagRegex = new HashMap<String, String>();
 
-	/*
+	/**
 	 * This regex parses identifies the different components of MT-standard format
 	 * of a tag
 	 */
 	private static final String REGEX_TAG_INFO = "(?<BracketPrefix>\\[)?(?<Prefix>(?>[/A-Z :,])*)(?>(?<NewLine>\\\\n)|(?<UTCInd>\\[N\\]2!n\\[2!n\\])|(?<Length>\\d+(?>\\-\\d+|!|\\*\\d+)?)(?<Charset>n|a|h|x|y|z|c|d)|(?<Static>[^\\[\\]]))(?<Suffix>/*)(?<BracketSuffix>\\])?";
 
+	/**
+	 * Static initialization
+	 */
+	static {
+		Map<String, String> tempCharsetsPatterns = new HashMap<String, String>();
+		tempCharsetsPatterns.put("n", "\\d");
+		tempCharsetsPatterns.put("a", "[A-Z]");
+		tempCharsetsPatterns.put("c", "[A-Z0-9]");
+		tempCharsetsPatterns.put("h", "[A-F0-9]");
+		tempCharsetsPatterns.put("d", "[0-9,]");
+
+		// SWIFT Character-sets
+		tempCharsetsPatterns.put("x", "[a-zA-Z0-9\\/\\-?:().,'+ ]");
+		tempCharsetsPatterns.put("y", "[A-Z0-9\\/\\-?:().,'+=!\\\"%&*<>; ]");
+		tempCharsetsPatterns.put("z", "[a-zA-Z0-9\\/\\-?:().,'+=!\\\"%&*<>;{@#_ \\r\\n]");
+		charsetsPatterns = tempCharsetsPatterns;
+	}
+
 	public TagFactory() throws IOException {
-//		initCharsets();
 		try {
 			loadTagDefinitions();
 		} catch (Exception e) {
@@ -167,7 +169,7 @@ public class TagFactory {
 
 	}
 
-	/*
+	/**
 	 * Translate quantifiers used in MT-Standard to regex-versions
 	 */
 	private static String getRegexQuantifier(String desc) throws Exception {
@@ -190,8 +192,16 @@ public class TagFactory {
 		return String.format("{%s,%s}", 0, desc);
 	}
 
-	/*
-	 * TODO: We are here.
+	/**
+	 * This method takes the match result of a single field in a tag definiton and
+	 * builds a regex for this field.
+	 * 
+	 * @param tagInfoMatcher {@code Matcher}-object which has matched the field
+	 *                       definition
+	 * @param fieldName      Name of the field
+	 * @return A regex describing the field format, including length, optionality
+	 *         and characterset
+	 * @throws Exception
 	 */
 	private static String createFieldRegex(Matcher tagInfoMatcher, String fieldName) throws Exception {
 		String Prefix = regexExcape(tagInfoMatcher.group("Prefix"));
@@ -253,6 +263,9 @@ public class TagFactory {
 		return regex;
 	}
 
+	/**
+	 * Used to escape some characters
+	 */
 	private static String regexExcape(String regex) {
 		if (regex != null) {
 
@@ -262,7 +275,6 @@ public class TagFactory {
 				c = regex.charAt(i);
 				if (c == '/') {
 					sb.append("\\/");
-
 				} else
 					sb.append(c);
 			}
@@ -272,6 +284,17 @@ public class TagFactory {
 
 	}
 
+	/**
+	 * Factory-method for creating a tag. Using preloaded information about the tag
+	 * definition
+	 * 
+	 * @param tag     Tag to create, i.e. "19A"
+	 * @param content The contents of the field in the MT-message after the
+	 *                ":{Tag}:"-prefix
+	 * @return {@code Tag}-object representing the input.
+	 * @throws UnknownTagException If the contents of the {@code tag} parameter does
+	 *                             not represent a tag in the MT Standard
+	 */
 	public Tag createTag(String tag, String content) throws UnknownTagException {
 		Objects.requireNonNull(tag, "Tag cannot be null");
 		Objects.requireNonNull(content, "Tagcontent cannot be null");
@@ -311,6 +334,15 @@ public class TagFactory {
 
 	}
 
+	/**
+	 * Performs additional validation on the contents of a numeric field not already
+	 * programmed in the regex-components.
+	 * 
+	 * @param value The matched numeric field content
+	 * @throws MTSyntaxException If the {@code value}-parameter is not a propperly
+	 *                           formatted numeric format in accordance with the MT
+	 *                           standard.
+	 */
 	private void validateNumericField(String value) throws MTSyntaxException {
 		String error = null;
 		int commaIx = value.indexOf(',');
@@ -326,6 +358,9 @@ public class TagFactory {
 		}
 	}
 
+	/**
+	 * Get the names of the different fields in a given tag
+	 */
 	private ArrayList<String> getTagFieldNames(String tag) throws UnknownTagException {
 		if (tagFields.containsKey(tag)) {
 			return tagFields.get(tag);
@@ -333,6 +368,11 @@ public class TagFactory {
 		throw new UnknownTagException(tag);
 	}
 
+	/**
+	 * Get the regex to be used in matching the contents of a tag
+	 * 
+	 * @throws UnknownTagException If the tag is not part of the MT standard.
+	 */
 	String getTagRegex(String tag) throws UnknownTagException {
 		if (tagRegex.containsKey(tag)) {
 			return tagRegex.get(tag);

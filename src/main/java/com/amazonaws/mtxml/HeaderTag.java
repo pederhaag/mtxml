@@ -2,7 +2,7 @@ package com.amazonaws.mtxml;
 
 import java.util.Objects;
 
-/*
+/**
  * Class for modelling the individual tags in headers of the form {@code {t_i:v_i}}
  * occurring in {@code TrailerHeaderBlock} and {@code UserHeaderBlock} classes
  */

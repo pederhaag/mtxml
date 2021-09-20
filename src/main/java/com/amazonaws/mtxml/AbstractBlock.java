@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  *
  */
 public abstract class AbstractBlock implements MTComponent {
-	/*
+	/**
 	 * Regex pattern for identifying the tag-value pairs of the form {@code
 	 * {t_i:v_i}}
 	 */
@@ -26,7 +26,7 @@ public abstract class AbstractBlock implements MTComponent {
 
 	private final String blockIdentifier;
 
-	/*
+	/**
 	 * Container for the tags
 	 */
 	private ArrayList<HeaderTag> tags;
@@ -73,7 +73,7 @@ public abstract class AbstractBlock implements MTComponent {
 		return xml;
 	}
 
-	/*
+	/**
 	 * Get the name of the root node to be used in a XML representation
 	 */
 	abstract String getXmlNodeName();
@@ -82,7 +82,7 @@ public abstract class AbstractBlock implements MTComponent {
 		return blockIdentifier;
 	}
 
-	void addTag(String tag, String value) {
+	private void addTag(String tag, String value) {
 		tags.add(new HeaderTag(tag, value));
 	}
 

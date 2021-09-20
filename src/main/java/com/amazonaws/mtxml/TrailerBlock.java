@@ -1,7 +1,7 @@
 package com.amazonaws.mtxml;
 
-/*
- * https://www.paiementor.com/swift-mt-message-block-5-trailers-description/
+/**
+ * Modelling of the trailerblock part of a MT message
  */
 public class TrailerBlock extends AbstractBlock implements MTComponent {
 

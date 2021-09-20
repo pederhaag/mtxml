@@ -3,28 +3,28 @@ package com.amazonaws.mtxml;
 import java.util.ArrayList;
 import java.util.Objects;
 
-/*
+/**
  *
  * {@code Tag} models a individual tag in a SWIFT MT message. It often contains different subfields.
  * 
  */
 class Tag implements MTComponent {
-	/*
+	/**
 	 * Container for fieldnames
 	 */
 	private ArrayList<String> fieldNames;
 
-	/*
+	/**
 	 * Container for fieldvalues
 	 */
 	private ArrayList<String> fieldValues;
 
-	/*
+	/**
 	 * The name of the tag, i.e. 19A, 61 etc.
 	 */
 	private String tagName;
 
-	/*
+	/**
 	 * Defines a set of fieldnames which are to be considered numeric and will
 	 * therefore be subject to additional validation in the {@code TagFactory}
 	 * class. {@see TagFactory#validateNumericField} {@see isNumericField}
@@ -78,12 +78,13 @@ class Tag implements MTComponent {
 
 	@Override
 	public String toXml() {
-		String opening = null;
+		String xmlOpening = null;
 		String qualifier = null;
 
 		ArrayList<String> fieldValuesToXml = new ArrayList<String>(fieldValues);
 		ArrayList<String> fieldNamesToXml = new ArrayList<String>(fieldNames);
 
+		// If the qualifier is found, remove it from the children-list
 		if (fieldNamesToXml.size() > 0) {
 			if (fieldNamesToXml.get(0).equals("Qualifier")) {
 				qualifier = fieldValuesToXml.remove(0);
@@ -91,33 +92,36 @@ class Tag implements MTComponent {
 			}
 		}
 
+		// Write the opening xml-tag
 		if (qualifier == null) {
-			opening = XmlFactory.openNode("Tag" + tagName);
+			xmlOpening = XmlFactory.openNode("Tag" + tagName);
 		} else {
-			opening = XmlFactory.openNode("Tag" + tagName, "Qualifier", qualifier);
+			xmlOpening = XmlFactory.openNode("Tag" + tagName, "Qualifier", qualifier);
 		}
 
-		String content = "";
-
+		// Loop through the fields and create children-nodes
+		String xmlChildren = "";
 		for (int i = 0; i < fieldNamesToXml.size(); i++) {
 
 			String fieldValue = fieldValuesToXml.get(i);
 			String fieldName = fieldNamesToXml.get(i);
 
 			if (fieldValue.contains("\n")) {
-				content += XmlFactory.openNode(fieldName);
+				xmlChildren += XmlFactory.openNode(fieldName);
+				// Multiline fields are split into children "Line" nodes
 				for (String line : fieldValue.split("\n")) {
-					content += XmlFactory.writeNode("Line", line);
+					xmlChildren += XmlFactory.writeNode("Line", line);
 				}
-				content += XmlFactory.closeNode(fieldName);
+				xmlChildren += XmlFactory.closeNode(fieldName);
 			} else {
-				content += XmlFactory.writeNode(fieldName, fieldValue);
+				xmlChildren += XmlFactory.writeNode(fieldName, fieldValue);
 			}
 		}
 
-		String closing = XmlFactory.closeNode("Tag" + tagName);
+		// Close the root node of the tag
+		String xmlClosing = XmlFactory.closeNode("Tag" + tagName);
 
-		return opening + content + closing;
+		return xmlOpening + xmlChildren + xmlClosing;
 	}
 
 	public String toString() {

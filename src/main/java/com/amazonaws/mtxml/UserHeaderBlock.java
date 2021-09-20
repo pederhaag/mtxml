@@ -1,7 +1,7 @@
 package com.amazonaws.mtxml;
 
-/*
- * https://www.paiementor.com/swift-mt-message-block-3-user-header-description/
+/**
+ * Modelling of the userheader block in a MT-message
  */
 public class UserHeaderBlock extends AbstractBlock implements MTComponent {
 
