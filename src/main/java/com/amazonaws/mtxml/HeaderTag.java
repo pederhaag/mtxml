@@ -7,6 +7,7 @@ import java.util.Objects;
  * occurring in {@code TrailerHeaderBlock} and {@code UserHeaderBlock} classes
  */
 class HeaderTag {
+	//TODO: Needs to implement MTComponent
 	final String tag;
 	final String value;
 

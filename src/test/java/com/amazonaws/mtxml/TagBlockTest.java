@@ -15,6 +15,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.amazonaws.test.utils.TestingUtils;
+
 import de.siegmar.fastcsv.reader.CommentStrategy;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.reader.CsvRow;
@@ -25,33 +27,7 @@ abstract class TagBlockTest {
 	protected static String[] invalidBlocks;
 	protected static String blockIdentifier;
 
-	private static final String testFolderPath = new File("src/test").getAbsolutePath();
-	private static final String testResourcesPath = new File(testFolderPath + "/resources").getAbsolutePath();
-
 	abstract AbstractBlock createBlock(String content);
-
-	protected static void initValidBlocks(String[] validBlocksInputs) throws IOException {
-		validBlocks = new HashMap<String, ArrayList<String[]>>();
-		// Read blockdata from csv files
-		for (String testcase : validBlocksInputs) {
-			String filepath = testResourcesPath + "/" + testcase;
-
-			CsvReaderBuilder builder = CsvReader.builder().commentStrategy(CommentStrategy.SKIP);
-			CsvReader csv = builder.build(new File(filepath).toPath(), Charset.defaultCharset());
-
-			String block = "";
-			ArrayList<String[]> blockTags = new ArrayList<String[]>();
-			for (CsvRow row : csv) {
-				String[] tagPair = row.getFields().stream().toArray(String[]::new);
-
-				blockTags.add(tagPair);
-				block += String.format("{%s:%s}", tagPair[0], tagPair[1]);
-			}
-			block = String.format("{" + blockIdentifier + ":%s}", block);
-
-			validBlocks.put(block, blockTags);
-		}
-	}
 
 	/*
 	 * Valid constructors
@@ -133,9 +109,7 @@ abstract class TagBlockTest {
 	}
 
 	@Test
-	void testToXml() {
-		fail("Needs to be implemented in subclass.");
-	}
+	abstract void testToXml();
 
 	@ParameterizedTest
 	@MethodSource("validBlocks")

@@ -5,6 +5,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.amazonaws.mtxml.utils.XmlFactory;
+
 /**
  * 
  * {@code AbstractBlock} models blocks on the for
@@ -17,6 +19,7 @@ public abstract class AbstractBlock implements MTComponent {
 	 * Regex pattern for identifying the tag-value pairs of the form {@code
 	 * {t_i:v_i}}
 	 */
+	// (?<UserHeader>\\{3:(?>\\{\\w*:[\\w\\/-]*\\})*\\})?
 	private final static String REGEX_PATTERN_TAG = "\\{(.*?):(.*?)\\}";
 
 	/**
@@ -66,8 +69,10 @@ public abstract class AbstractBlock implements MTComponent {
 
 	public String toXml() {
 		String xml = XmlFactory.openNode(getXmlNodeName());
+		String nodeXmlContent;
 		for (HeaderTag t : tags) {
-			xml += XmlFactory.writeNode(t.tag, t.value);
+			nodeXmlContent = XmlFactory.writeNode("Tag", t.tag) + XmlFactory.writeNode("Contents", t.value);
+			xml += XmlFactory.writeNode(getXmlTagNodeName(t.tag), nodeXmlContent);
 		}
 		xml += XmlFactory.closeNode(getXmlNodeName());
 		return xml;
@@ -77,6 +82,7 @@ public abstract class AbstractBlock implements MTComponent {
 	 * Get the name of the root node to be used in a XML representation
 	 */
 	abstract String getXmlNodeName();
+	abstract String getXmlTagNodeName(String tag);
 
 	public String getBlockIdentifier() {
 		return blockIdentifier;

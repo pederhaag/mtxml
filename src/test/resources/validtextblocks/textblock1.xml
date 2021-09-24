@@ -1,0 +1,40 @@
+<TextBlock>
+  <Tag20>
+    <Contents>5938041866675668</Contents>
+  </Tag20>
+  <Tag23B>
+    <Type>SSUC</Type>
+  </Tag23B>
+  <Tag32A>
+    <Date>435355</Date>
+    <Currency>NLL</Currency>
+    <Amount>11494104.</Amount>
+  </Tag32A>
+  <Tag33B>
+    <Currency>NTD</Currency>
+    <Amount>37238689.</Amount>
+  </Tag33B>
+  <Tag50A>
+    <Account>NZ6654163037322</Account>
+    <BIC>WXQZNOUR</BIC>
+  </Tag50A>
+  <Tag53B>
+    <PartyIdentifier>NQ3107089273948</PartyIdentifier>
+  </Tag53B>
+  <Tag57A>
+    <BIC>LSSHNQTX</BIC>
+  </Tag57A>
+  <Tag59A>
+    <Account>NR3465267477850</Account>
+    <BIC>TNZPNTJK</BIC>
+  </Tag59A>
+  <Tag71A>
+    <Code>SWB</Code>
+  </Tag71A>
+  <Tag77B>
+    <Narrative>
+      <Line>/MLVDHHKS/ND//78</Line>
+      <Line>//CNTCB PININSINRQSNPNINNI</Line>
+    </Narrative>
+  </Tag77B>
+</TextBlock>

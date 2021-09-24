@@ -2,6 +2,7 @@ package com.amazonaws.mtxml;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -9,12 +10,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.amazonaws.test.utils.TestCases;
+
 class HeaderTagTest {
-	private static String[] validTags = { "123", "111", "222", "ok", "001", "002", "003" };
-	private static String[] validValues = { "SOMETHING", "BLABLA", "noreg", "num321", "1n2n3", "12312542365-64843524",
-			"XXX-XXX-XXX?" };
-	
-	
+
+	private static ArrayList<String[]> validTags = TestCases.getValidHeaderTags();
 
 	/*
 	 * Constructor - valid values
@@ -45,8 +45,8 @@ class HeaderTagTest {
 
 	private static Stream<Arguments> validValues() {
 		Stream.Builder<Arguments> builder = Stream.builder();
-		for (int i = 0; i < validTags.length; i++) {
-			builder.add(Arguments.arguments(validTags[i], validValues[i]));
+		for (String[] tagValuePair : validTags) {
+			builder.add(Arguments.arguments(tagValuePair[0], tagValuePair[1]));
 		}
 
 		return builder.build();
@@ -80,7 +80,7 @@ class HeaderTagTest {
 
 	@Test
 	public void testEmptyValue() {
-		assertThrows(IllegalArgumentException.class, () -> new HeaderTag("123", ""));
+		new HeaderTag("123", "");
 	}
 
 	@Test

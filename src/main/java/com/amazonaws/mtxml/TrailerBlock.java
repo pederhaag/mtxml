@@ -14,4 +14,9 @@ public class TrailerBlock extends AbstractBlock implements MTComponent {
 		return "TrailerBlock";
 	}
 
+	@Override
+	String getXmlTagNodeName(String tag) {
+		return "Trailer";
+	}
+
 }

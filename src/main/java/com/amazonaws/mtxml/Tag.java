@@ -3,9 +3,12 @@ package com.amazonaws.mtxml;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import com.amazonaws.mtxml.utils.XmlFactory;
+
 /**
  *
- * {@code Tag} models a individual tag in a SWIFT MT message. It often contains different subfields.
+ * {@code Tag} models a individual tag in a SWIFT MT message. It often contains
+ * different subfields.
  * 
  */
 class Tag implements MTComponent {
@@ -18,6 +21,7 @@ class Tag implements MTComponent {
 	 * Container for fieldvalues
 	 */
 	private ArrayList<String> fieldValues;
+//	private Map<String, String> fields =
 
 	/**
 	 * The name of the tag, i.e. 19A, 61 etc.

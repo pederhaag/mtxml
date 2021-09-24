@@ -1,0 +1,437 @@
+<TextBlock>
+  <Block16R Code="GENL">
+    <Field28E>
+      <MessageIndex>2</MessageIndex>
+      <Total>TRAO</Total>
+    </Field28E>
+    <Field20C Qualifier="SUBZ">
+      <Reference>2516954888409171</Reference>
+    </Field20C>
+    <Field23G>
+      <Function>NXPY</Function>
+    </Field23G>
+    <Field98A Qualifier="DGAU">
+      <Date>92145035</Date>
+    </Field98A>
+    <Field98A Qualifier="SOEY">
+      <Date>40434533</Date>
+    </Field98A>
+    <Field22F Qualifier="SNJG">
+      <Indicator>ZMIO</Indicator>
+    </Field22F>
+    <Field22F Qualifier="RROF">
+      <Indicator>TGJJ</Indicator>
+    </Field22F>
+    <Field22F Qualifier="SXZQ">
+      <Indicator>WRST</Indicator>
+    </Field22F>
+    <Field22F Qualifier="SDMA">
+      <Indicator>SQHW</Indicator>
+    </Field22F>
+    <Field97A Qualifier="SXJN">
+      <AccountNumber>5740603</AccountNumber>
+    </Field97A>
+    <Field17B Qualifier="GOWI">
+      <Flag>K</Flag>
+    </Field17B>
+    <Field17B Qualifier="SVZW">
+      <Flag>N</Flag>
+    </Field17B>
+    <Field17B Qualifier="FJNS">
+      <Flag>N</Flag>
+    </Field17B>
+  </Block16R>
+  <Block16R Code="SUBSAFE">
+    <Block16R Code="FIN">
+      <Field35B>
+        <IdentificationOfSecurity>NA3204918932</IdentificationOfSecurity>
+        <DescriptionOfSecurity>
+          <Line>UBY ZDJW T ES 2  29/89/14/NGK/</Line>
+          <Line>/FSAH/XKOO/DWIS/440,/JIM/6,</Line>
+          <Line>/EOL/03724899/LSB/268,8</Line>
+        </DescriptionOfSecurity>
+      </Field35B>
+      <Field90A Qualifier="MWHY">
+        <PercentageTypeCode>KXTV</PercentageTypeCode>
+        <Price>73.</Price>
+      </Field90A>
+      <Field98A Qualifier="KLIE">
+        <Date>94466717</Date>
+      </Field98A>
+      <Field93B Qualifier="TXFE">
+        <QuantityTypeCode>TUMP</QuantityTypeCode>
+        <Balance>69494679.</Balance>
+      </Field93B>
+      <Block16R Code="SUBBAL">
+        <Field93B Qualifier="KNMN">
+          <QuantityTypeCode>OGAH</QuantityTypeCode>
+          <Balance>42298192.</Balance>
+        </Field93B>
+        <Field93B Qualifier="YQII">
+          <QuantityTypeCode>XBOJ</QuantityTypeCode>
+          <Balance>69590312.</Balance>
+        </Field93B>
+        <Field94C Qualifier="SLOK">
+          <CountryCode>NB</CountryCode>
+        </Field94C>
+      </Block16R>
+      <Field19A Qualifier="OYUD">
+        <CurrencyCode>NZP</CurrencyCode>
+        <Amount>3749906.93</Amount>
+      </Field19A>
+    </Block16R>
+    <Block16R Code="FIN">
+      <Field35B>
+        <IdentificationOfSecurity>NJ6876805041</IdentificationOfSecurity>
+        <DescriptionOfSecurity>
+          <Line>SILPQZ ISQ /NIE/</Line>
+          <Line>/HSUY/KS</Line>
+        </DescriptionOfSecurity>
+      </Field35B>
+      <Field90B Qualifier="UKYW">
+        <AmountTypeCode>YLUH</AmountTypeCode>
+        <CurrencyCode>NFQ</CurrencyCode>
+        <Price>285.8</Price>
+      </Field90B>
+      <Field98A Qualifier="DOIC">
+        <Date>10075680</Date>
+      </Field98A>
+      <Field93B Qualifier="FCAV">
+        <QuantityTypeCode>ZNIU</QuantityTypeCode>
+        <Balance>74720095.</Balance>
+      </Field93B>
+      <Block16R Code="SUBBAL">
+        <Field93B Qualifier="WAOY">
+          <QuantityTypeCode>VNIC</QuantityTypeCode>
+          <Balance>84554791.</Balance>
+        </Field93B>
+        <Field93B Qualifier="DVTI">
+          <QuantityTypeCode>JNIF</QuantityTypeCode>
+          <Balance>21222707.</Balance>
+        </Field93B>
+        <Field94C Qualifier="SCHU">
+          <CountryCode>NP</CountryCode>
+        </Field94C>
+      </Block16R>
+      <Field19A Qualifier="MZTW">
+        <CurrencyCode>NZO</CurrencyCode>
+        <Amount>1648969105.2</Amount>
+      </Field19A>
+    </Block16R>
+    <Block16R Code="FIN">
+      <Field35B>
+        <IdentificationOfSecurity>NY1654225705</IdentificationOfSecurity>
+        <DescriptionOfSecurity>
+          <Line>DOC XSV /NIJ/</Line>
+          <Line>/WSAO/RS</Line>
+        </DescriptionOfSecurity>
+      </Field35B>
+      <Field90B Qualifier="QUPP">
+        <AmountTypeCode>DNEF</AmountTypeCode>
+        <CurrencyCode>NGA</CurrencyCode>
+        <Price>16.12</Price>
+      </Field90B>
+      <Field98A Qualifier="DFIX">
+        <Date>01634270</Date>
+      </Field98A>
+      <Field93B Qualifier="EEOK">
+        <QuantityTypeCode>LNIE</QuantityTypeCode>
+        <Balance>833676.</Balance>
+      </Field93B>
+      <Block16R Code="SUBBAL">
+        <Field93B Qualifier="AVKW">
+          <QuantityTypeCode>ZNIP</QuantityTypeCode>
+          <Balance>804395.</Balance>
+        </Field93B>
+        <Field93B Qualifier="SBWI">
+          <QuantityTypeCode>HNIZ</QuantityTypeCode>
+          <Balance>905882.</Balance>
+        </Field93B>
+        <Field94C Qualifier="SHZP">
+          <CountryCode>NE</CountryCode>
+        </Field94C>
+      </Block16R>
+      <Field19A Qualifier="SLDV">
+        <CurrencyCode>NQN</CurrencyCode>
+        <Amount>1435273.38</Amount>
+      </Field19A>
+    </Block16R>
+    <Block16R Code="FIN">
+      <Field35B>
+        <IdentificationOfSecurity>MS5739119285</IdentificationOfSecurity>
+        <DescriptionOfSecurity>
+          <Line>OQHINSQ ZS 6.47  83/42/61/THG/</Line>
+          <Line>/XSZB/MQLC/YHIS/63,471/GIZ/3,44</Line>
+          <Line>/XDM/48369382/WSA/163,</Line>
+        </DescriptionOfSecurity>
+      </Field35B>
+      <Field90A Qualifier="DEDC">
+        <PercentageTypeCode>TYDG</PercentageTypeCode>
+        <Price>516.345</Price>
+      </Field90A>
+      <Field98A Qualifier="LEIB">
+        <Date>89413045</Date>
+      </Field98A>
+      <Field93B Qualifier="MEQO">
+        <QuantityTypeCode>JBLK</QuantityTypeCode>
+        <Balance>23963674.</Balance>
+      </Field93B>
+      <Block16R Code="SUBBAL">
+        <Field93B Qualifier="IGOL">
+          <QuantityTypeCode>VTFP</QuantityTypeCode>
+          <Balance>49526704.</Balance>
+        </Field93B>
+        <Field93B Qualifier="PEUI">
+          <QuantityTypeCode>EAYQ</QuantityTypeCode>
+          <Balance>15809796.</Balance>
+        </Field93B>
+        <Field94F Qualifier="SBVC">
+          <Place>ITSG</Place>
+          <BIC>BXOSQROX</BIC>
+        </Field94F>
+      </Block16R>
+      <Field19A Qualifier="MNCM">
+        <CurrencyCode>VGT</CurrencyCode>
+        <Amount>99004687.</Amount>
+      </Field19A>
+    </Block16R>
+    <Block16R Code="FIN">
+      <Field35B>
+        <IdentificationOfSecurity>LL1145882914</IdentificationOfSecurity>
+        <DescriptionOfSecurity>
+          <Line>NMPCNWIN AQUF 8  53/29/90/NPN/</Line>
+          <Line>/SSNT/GNWP/WIH/4,/DNS/69945468</Line>
+        </DescriptionOfSecurity>
+      </Field35B>
+      <Field90A Qualifier="SYRN">
+        <PercentageTypeCode>MAKW</PercentageTypeCode>
+        <Price>050.43</Price>
+      </Field90A>
+      <Field98A Qualifier="JPIF">
+        <Date>41326509</Date>
+      </Field98A>
+      <Field93B Qualifier="GVAU">
+        <QuantityTypeCode>EDFI</QuantityTypeCode>
+        <Balance>70085952.</Balance>
+      </Field93B>
+      <Block16R Code="SUBBAL">
+        <Field93B Qualifier="VUYD">
+          <QuantityTypeCode>YXFA</QuantityTypeCode>
+          <Balance>52438764.</Balance>
+        </Field93B>
+        <Field93B Qualifier="WFZI">
+          <QuantityTypeCode>ERLO</QuantityTypeCode>
+          <Balance>94912233.</Balance>
+        </Field93B>
+        <Field94C Qualifier="SRHY">
+          <CountryCode>JL</CountryCode>
+        </Field94C>
+      </Block16R>
+      <Field19A Qualifier="LRFK">
+        <CurrencyCode>JWT</CurrencyCode>
+        <Amount>84625943.</Amount>
+      </Field19A>
+    </Block16R>
+    <Block16R Code="FIN">
+      <Field35B>
+        <IdentificationOfSecurity>DI3323168209</IdentificationOfSecurity>
+        <DescriptionOfSecurity>
+          <Line>RINNISV NP 9.15  96/27/63/SFL/</Line>
+          <Line>/USUA/BVGH/HKIS/82,77/DII/6,35</Line>
+          <Line>/XVH/60166975</Line>
+        </DescriptionOfSecurity>
+      </Field35B>
+      <Field90A Qualifier="ITVS">
+        <PercentageTypeCode>CXRS</PercentageTypeCode>
+        <Price>417.853015</Price>
+      </Field90A>
+      <Field98A Qualifier="FVID">
+        <Date>33188815</Date>
+      </Field98A>
+      <Field93B Qualifier="DIHS">
+        <QuantityTypeCode>ENHW</QuantityTypeCode>
+        <Balance>09229080.</Balance>
+      </Field93B>
+      <Block16R Code="SUBBAL">
+        <Field93B Qualifier="FAFO">
+          <QuantityTypeCode>SPGV</QuantityTypeCode>
+          <Balance>31659515.</Balance>
+        </Field93B>
+        <Field93B Qualifier="NFBI">
+          <QuantityTypeCode>DOQA</QuantityTypeCode>
+          <Balance>22356980.</Balance>
+        </Field93B>
+        <Field94C Qualifier="SHYU">
+          <CountryCode>QI</CountryCode>
+        </Field94C>
+      </Block16R>
+      <Field19A Qualifier="XOLQ">
+        <CurrencyCode>UAW</CurrencyCode>
+        <Amount>92809986.5</Amount>
+      </Field19A>
+    </Block16R>
+    <Block16R Code="FIN">
+      <Field35B>
+        <IdentificationOfSecurity>NE1393463548</IdentificationOfSecurity>
+        <DescriptionOfSecurity>
+          <Line>NIJHRYIGN  1.73  07/67/70/NSO/</Line>
+          <Line>/VSEF/OKGM/GZIS/498,7/BIC/6,54</Line>
+          <Line>/RMP/31301391</Line>
+        </DescriptionOfSecurity>
+      </Field35B>
+      <Field90A Qualifier="FCIP">
+        <PercentageTypeCode>MZIV</PercentageTypeCode>
+        <Price>606.1594</Price>
+      </Field90A>
+      <Field98A Qualifier="BDIW">
+        <Date>12233613</Date>
+      </Field98A>
+      <Field93B Qualifier="POSJ">
+        <QuantityTypeCode>QRNP</QuantityTypeCode>
+        <Balance>1988600199.</Balance>
+      </Field93B>
+      <Block16R Code="SUBBAL">
+        <Field93B Qualifier="HPMZ">
+          <QuantityTypeCode>IGHD</QuantityTypeCode>
+          <Balance>5060342594.</Balance>
+        </Field93B>
+        <Field93B Qualifier="FSFI">
+          <QuantityTypeCode>JEEG</QuantityTypeCode>
+          <Balance>3506901236.</Balance>
+        </Field93B>
+        <Field94C Qualifier="STBM">
+          <CountryCode>NX</CountryCode>
+        </Field94C>
+      </Block16R>
+      <Field19A Qualifier="WGFY">
+        <CurrencyCode>NUK</CurrencyCode>
+        <Amount>4596584618.</Amount>
+      </Field19A>
+    </Block16R>
+    <Block16R Code="FIN">
+      <Field35B>
+        <IdentificationOfSecurity>NO8768863792</IdentificationOfSecurity>
+        <DescriptionOfSecurity>
+          <Line>NFKWIM NUNZANAKYX NSD /NTN/</Line>
+          <Line>/SSKM/QS</Line>
+        </DescriptionOfSecurity>
+      </Field35B>
+      <Field90B Qualifier="XLAV">
+        <AmountTypeCode>ZVMU</AmountTypeCode>
+        <CurrencyCode>NRW</CurrencyCode>
+        <Price>51.42</Price>
+      </Field90B>
+      <Field98A Qualifier="YSIC">
+        <Date>62144240</Date>
+      </Field98A>
+      <Field93B Qualifier="TOTV">
+        <QuantityTypeCode>BNIO</QuantityTypeCode>
+        <Balance>8243545.</Balance>
+      </Field93B>
+      <Block16R Code="SUBBAL">
+        <Field93B Qualifier="ZFVH">
+          <QuantityTypeCode>GNIZ</QuantityTypeCode>
+          <Balance>4614880.</Balance>
+        </Field93B>
+        <Field93B Qualifier="UBMI">
+          <QuantityTypeCode>BNIB</QuantityTypeCode>
+          <Balance>6516851.</Balance>
+        </Field93B>
+        <Field94C Qualifier="SEIO">
+          <CountryCode>NT</CountryCode>
+        </Field94C>
+      </Block16R>
+      <Block16R Code="SUBBAL">
+        <Field93C Qualifier="NGNM">
+          <QuantityTypeCode>ANIQ</QuantityTypeCode>
+          <BalanceTypeCode>NJPY</BalanceTypeCode>
+          <Balance>50609.</Balance>
+        </Field93C>
+        <Field94C Qualifier="SHTB">
+          <CountryCode>NM</CountryCode>
+        </Field94C>
+      </Block16R>
+      <Field19A Qualifier="SJJU">
+        <CurrencyCode>NRR</CurrencyCode>
+        <Amount>593786744.7</Amount>
+      </Field19A>
+    </Block16R>
+    <Block16R Code="FIN">
+      <Field35B>
+        <IdentificationOfSecurity>HS5880794144</IdentificationOfSecurity>
+        <DescriptionOfSecurity>
+          <Line>EPINNU SS 9  40/56/24/BDK/</Line>
+          <Line>/ISCR/JAOT/ANIS/17,193/WIB/6,</Line>
+          <Line>/WJY/95093187/ZSI/904,</Line>
+        </DescriptionOfSecurity>
+      </Field35B>
+      <Field90A Qualifier="FYFH">
+        <PercentageTypeCode>HPRF</PercentageTypeCode>
+        <Price>716.876</Price>
+      </Field90A>
+      <Field98A Qualifier="DHIT">
+        <Date>89716933</Date>
+      </Field98A>
+      <Field93B Qualifier="IZOL">
+        <QuantityTypeCode>XJGN</QuantityTypeCode>
+        <Balance>5523283.</Balance>
+      </Field93B>
+      <Block16R Code="SUBBAL">
+        <Field93B Qualifier="UEZT">
+          <QuantityTypeCode>SWWJ</QuantityTypeCode>
+          <Balance>2006258.</Balance>
+        </Field93B>
+        <Field93B Qualifier="WBXI">
+          <QuantityTypeCode>EBMV</QuantityTypeCode>
+          <Balance>8293200.</Balance>
+        </Field93B>
+        <Field94F Qualifier="SGQC">
+          <Place>ISSN</Place>
+          <BIC>QDDLIXMB</BIC>
+        </Field94F>
+      </Block16R>
+      <Field19A Qualifier="SBUX">
+        <CurrencyCode>DHZ</CurrencyCode>
+        <Amount>4264076.</Amount>
+      </Field19A>
+    </Block16R>
+    <Block16R Code="FIN">
+      <Field35B>
+        <IdentificationOfSecurity>OD9602778683</IdentificationOfSecurity>
+        <DescriptionOfSecurity>
+          <Line>GNYQD INIFOQI /WDW/</Line>
+          <Line>/JSSM/DS</Line>
+        </DescriptionOfSecurity>
+      </Field35B>
+      <Field90B Qualifier="YPZD">
+        <AmountTypeCode>FIQB</AmountTypeCode>
+        <CurrencyCode>DRE</CurrencyCode>
+        <Price>959.1</Price>
+      </Field90B>
+      <Field98A Qualifier="MBIT">
+        <Date>53194005</Date>
+      </Field98A>
+      <Field93B Qualifier="SYXA">
+        <QuantityTypeCode>LNIB</QuantityTypeCode>
+        <Balance>421844.</Balance>
+      </Field93B>
+      <Block16R Code="SUBBAL">
+        <Field93B Qualifier="USCS">
+          <QuantityTypeCode>XNIT</QuantityTypeCode>
+          <Balance>896896.</Balance>
+        </Field93B>
+        <Field93B Qualifier="GAEI">
+          <QuantityTypeCode>VNID</QuantityTypeCode>
+          <Balance>673799.</Balance>
+        </Field93B>
+        <Field94C Qualifier="SHGM">
+          <CountryCode>QH</CountryCode>
+        </Field94C>
+      </Block16R>
+      <Field19A Qualifier="JYZX">
+        <CurrencyCode>XIQ</CurrencyCode>
+        <Amount>40815571.</Amount>
+      </Field19A>
+    </Block16R>
+  </Block16R>
+</TextBlock>

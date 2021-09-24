@@ -6,6 +6,9 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.amazonaws.mtxml.utils.MTUtils;
+import com.amazonaws.mtxml.utils.XmlFactory;
+
 /*
  * Class for modelling the basic headerblock in a MT message
  */
@@ -13,21 +16,26 @@ public class BasicHeaderBlock implements MTComponent {
 	/**
 	 * Regex pattern for identyfying the elements in the basic headerblock
 	 */
-	private final static String REGEX_PATTERN = "\\{(?<BlockIdentifier>1):(?<AppID>[A-Z])(?<ServiceID>0\\d|\\d{2})(?<LTAdress>[A-Z]{12})(?<SessionNumber>\\d{4})(?<SequenceNumber>\\d{6})\\}";
+	private final static String REGEX_PATTERN = "\\{(?<BlockIdentifier>1):(?<AppID>[A-Z])(?<ServiceID>0\\d|\\d{2})(?<LTAddress>[A-Z]{12})(?<SessionNumber>\\d{4})(?<SequenceNumber>\\d{6})\\}";
 
 	/**
 	 * Container for the tags
 	 */
 	private Map<String, String> data = new HashMap<String, String>();
+	private Map<String, String> LTAddressData = new HashMap<String, String>();
 
 	private void initMaps() {
 		data.put("BlockIdentifier", null);
 		data.put("AppID", null);
 		data.put("ServiceID", null);
-		data.put("LTAdress", null);
+		data.put("LTAddress", null);
 		data.put("SessionNumber", null);
 		data.put("SequenceNumber", null);
 		data.put("RawData", null);
+
+		LTAddressData.put("BIC", null);
+		LTAddressData.put("LogicalTerminal", null);
+		LTAddressData.put("BIC8", null);
 	}
 
 	BasicHeaderBlock(String content) {
@@ -44,13 +52,19 @@ public class BasicHeaderBlock implements MTComponent {
 		}
 
 		// Add found datafields
-		setData(data, "BlockIdentifier", matcher.group("BlockIdentifier"));
-		setData(data, "AppID", matcher.group("AppID"));
-		setData(data, "ServiceID", matcher.group("ServiceID"));
-		setData(data, "LTAdress", matcher.group("LTAdress"));
-		setData(data, "SessionNumber", matcher.group("SessionNumber"));
-		setData(data, "SequenceNumber", matcher.group("SequenceNumber"));
-		setData(data, "RawData", content);
+		putData(data, "BlockIdentifier", matcher.group("BlockIdentifier"));
+		putData(data, "AppID", matcher.group("AppID"));
+		putData(data, "ServiceID", matcher.group("ServiceID"));
+		putData(data, "LTAddress", MTUtils.formatBIC(matcher.group("LTAddress")));
+		putData(data, "SessionNumber", matcher.group("SessionNumber"));
+		putData(data, "SequenceNumber", matcher.group("SequenceNumber"));
+		putData(data, "RawData", content);
+
+		// LT Address details
+		String[] LTAddressSplit = MTUtils.splitLogicalTerminal(matcher.group("LTAddress"));
+		putData(LTAddressData, "BIC", LTAddressSplit[0]);
+		putData(LTAddressData, "LogicalTerminal", LTAddressSplit[1]);
+		putData(LTAddressData, "BIC8", LTAddressSplit[2]);
 
 	}
 
@@ -61,12 +75,12 @@ public class BasicHeaderBlock implements MTComponent {
 	 * @param key       Fieldname
 	 * @param value     Value of the field
 	 */
-	private void setData(Map<String, String> container, String key, String value) {
-		if (!data.containsKey(key)) {
+	private void putData(Map<String, String> container, String key, String value) {
+		if (!container.containsKey(key)) {
 			String msg = String.format("Container does not contain key '%s'.", key);
 			throw new IllegalArgumentException(msg);
 		}
-		data.put(key, value);
+		container.put(key, value == null ? "" : value);
 
 	}
 
@@ -77,11 +91,23 @@ public class BasicHeaderBlock implements MTComponent {
 	 * @return Value of said field
 	 */
 	public String getData(String field) {
-		if (!data.containsKey(field)) {
+
+		Map<String, String> container;
+		String fieldName;
+
+		if (field.startsWith("LTAddress.")) {
+			container = LTAddressData;
+			fieldName = field.substring("LTAddress.".length());
+		} else {
+			container = data;
+			fieldName = field;
+		}
+
+		if (!container.containsKey(fieldName)) {
 			String msg = String.format("Invalid field '%s'.", field);
 			throw new IllegalArgumentException(msg);
 		}
-		return data.get(field);
+		return container.get(fieldName);
 	}
 
 	/**
@@ -93,14 +119,25 @@ public class BasicHeaderBlock implements MTComponent {
 
 	@Override
 	public String toXml() {
-		String xml = XmlFactory.openNode("BasicHeaderBlock");
-		xml += XmlFactory.writeNode("AppID", data.get("AppID"));
-		xml += XmlFactory.writeNode("ServiceID", data.get("ServiceID"));
-		xml += XmlFactory.writeNode("LTAdress", data.get("LTAdress"));
+		String xml = XmlFactory.openNode("BasicHeader");
+		xml += XmlFactory.writeNode("ApplicationIdentifier", data.get("AppID"));
+		xml += XmlFactory.writeNode("ServiceIdentifier", data.get("ServiceID"));
+		xml += XmlFactory.writeNode("LTAddress", data.get("LTAddress"));
+
+		xml += XmlFactory.openNode("LTAddress_Details");
+		xml += XmlFactory.writeNode("BIC", LTAddressData.get("BIC"));
+		xml += XmlFactory.writeNode("LogicalTerminal", LTAddressData.get("LogicalTerminal"));
+		xml += XmlFactory.writeNode("BIC8", LTAddressData.get("BIC8"));
+		xml += XmlFactory.closeNode("LTAddress_Details");
+
 		xml += XmlFactory.writeNode("SessionNumber", data.get("SessionNumber"));
 		xml += XmlFactory.writeNode("SequenceNumber", data.get("SequenceNumber"));
-		xml += XmlFactory.closeNode("BasicHeaderBlock");
+		xml += XmlFactory.closeNode("BasicHeader");
 		return xml;
+	}
+
+	public static void main(String[] args) {
+		new BasicHeaderBlock("{1:F01MYBABBICAXXX0878450607}").getData("LTAddress.BIC");
 	}
 
 }

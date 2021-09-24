@@ -2,9 +2,9 @@ package com.amazonaws.mtxml;
 
 /**
  * 
- * {@code MTSyntaxException} is an exception indicating that an input
- * does not confirm to a predefined format and is therefore invalid
- * as input.
+ * {@code MTSyntaxException} is an exception indicating that an input does not
+ * confirm to the format set by the MT Standard and is therefore invalid as
+ * input.
  * 
  */
 public class MTSyntaxException extends IllegalArgumentException {

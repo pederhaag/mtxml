@@ -6,6 +6,9 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.amazonaws.mtxml.utils.MTUtils;
+import com.amazonaws.mtxml.utils.XmlFactory;
+
 /**
  * Class for modelling the application headerblock in a MT message
  */
@@ -32,6 +35,7 @@ public class ApplicationHeaderBlock implements MTComponent {
 	 */
 	private Map<String, String> data = new HashMap<String, String>();
 	private Map<String, String> mirData = new HashMap<String, String>();
+	private Map<String, String> destAddressData = new HashMap<String, String>();
 
 	/**
 	 * Method for defining which subfields to expect
@@ -42,6 +46,9 @@ public class ApplicationHeaderBlock implements MTComponent {
 		data.put("MT", null);
 
 		data.put("DestAddress", null);
+		destAddressData.put("BIC", null);
+		destAddressData.put("LogicalTerminal", null);
+		destAddressData.put("BIC8", null);
 		data.put("Priority", null);
 		data.put("DeliveryMonitoring", null);
 		data.put("ObsolencePeriod", null);
@@ -73,12 +80,18 @@ public class ApplicationHeaderBlock implements MTComponent {
 		if (matcherInput.find()) {
 			// Populate input-data
 			putData(data, "BlockIdentifier", matcherInput.group("BlockIdentifier"));
-			putData(data, "InOutID", matcherInput.group("BlockIdentifier"));
+			putData(data, "InOutID", matcherInput.group("InOutID"));
 			putData(data, "MT", matcherInput.group("MT"));
-			putData(data, "DestAddress", matcherInput.group("DestAddress"));
+			putData(data, "DestAddress", MTUtils.formatBIC(matcherInput.group("DestAddress")));
 			putData(data, "Priority", matcherInput.group("Priority"));
 			putData(data, "DeliveryMonitoring", matcherInput.group("DeliveryMonitoring"));
 			putData(data, "ObsolencePeriod", matcherInput.group("ObsolencePeriod"));
+
+			// Additional details on the Destination address
+			String[] destAddressSplit = MTUtils.splitLogicalTerminal(matcherInput.group("DestAddress"));
+			putData(destAddressData, "BIC", destAddressSplit[0]);
+			putData(destAddressData, "BIC8", destAddressSplit[2]);
+			putData(destAddressData, "LogicalTerminal", destAddressSplit[1]);
 
 		} else if (matcherOutput.find()) {
 			// Populate output-data
@@ -101,13 +114,14 @@ public class ApplicationHeaderBlock implements MTComponent {
 			putData(mirData, "SessionNumber", matcherMIR.group("SessionNumber"));
 			putData(mirData, "SequenceNumber", matcherMIR.group("SequenceNumber"));
 		} else {
-			throw new MTSyntaxException(REGEX_INPUT, content);
+			throw new MTSyntaxException(content + " does not match the applicationheader format");
 		}
 
 	}
 
 	/**
-	 * Wrapper for adding found value pairs into container
+	 * Wrapper for adding found value pairs into container. <em>Note: If attempting
+	 * to insert a null value an empty string will be inserted instead</em>.
 	 * 
 	 * @param container Container to put the data in
 	 * @param key       Fieldname
@@ -118,7 +132,7 @@ public class ApplicationHeaderBlock implements MTComponent {
 			String msg = String.format("Container does not contain key '%s'.", key);
 			throw new IllegalArgumentException(msg);
 		}
-		container.put(key, value);
+		container.put(key, value == null ? "" : value);
 	}
 
 	/**
@@ -130,69 +144,72 @@ public class ApplicationHeaderBlock implements MTComponent {
 	 */
 	public String getData(String field) {
 		Map<String, String> container;
-		String fieldContainer;
+		String fieldName;
 
 		if (field.startsWith("MIR.")) {
 			container = mirData;
-			fieldContainer = field.substring("MIR.".length());
+			fieldName = field.substring("MIR.".length());
+		} else if (field.startsWith("DestAddress.")) {
+			container = destAddressData;
+			fieldName = field.substring("DestAddress.".length());
 		} else {
 			container = data;
-			fieldContainer = field;
+			fieldName = field;
 		}
-		if (!container.containsKey(fieldContainer)) {
-			String msg = String.format("Invalid field '%s'.", fieldContainer);
+		if (!container.containsKey(fieldName)) {
+			String msg = String.format("Invalid field '%s'.", fieldName);
 			throw new IllegalArgumentException(msg);
 		}
-		return container.get(fieldContainer);
+		return container.get(fieldName);
 	}
 
 	/**
 	 * Return a list of valid fields
 	 */
-	public String[] validFields() {
-		String[] fields = new String[data.keySet().size() + mirData.keySet().size()];
-		int i = 0;
-		for (String field : data.keySet()) {
-			fields[i] = field;
-			i++;
-		}
-		for (String mirField : mirData.keySet()) {
-			fields[i] = "MIR." + mirField;
-			i++;
-		}
-		return fields;
-	}
-
+//	public String[] validFields() {
+//		String[] fields = new String[data.keySet().size() + mirData.keySet().size()];
+//		int i = 0;
+//		for (String field : data.keySet()) {
+//			fields[i] = field;
+//			i++;
+//		}
+//		for (String mirField : mirData.keySet()) {
+//			fields[i] = "MIR." + mirField;
+//			i++;
+//		}
+//		return fields;
+//	}
 
 	@Override
 	public String toXml() {
-		String xml = XmlFactory.openNode("ApplicationHeaderBlock");
-		
+		String xml = XmlFactory.openNode("ApplicationHeader");
+
 		if (data.get("InOutID").equals("I")) {
-			xml += XmlFactory.writeNode("InOutID", data.get("InOutID"));
-			xml += XmlFactory.writeNode("MT", data.get("MT"));
+			xml += XmlFactory.writeNode("InputOutputIdentifier", data.get("InOutID"));
+			xml += XmlFactory.writeNode("MessageType", data.get("MT"));
 			xml += XmlFactory.writeNode("DestAddress", data.get("DestAddress"));
+			xml += destAddressDetailsToXml();
 			xml += XmlFactory.writeNode("Priority", data.get("Priority"));
 			xml += XmlFactory.writeNode("DeliveryMonitoring", data.get("DeliveryMonitoring"));
 			xml += XmlFactory.writeNode("ObsolencePeriod", data.get("ObsolencePeriod"));
-			
+
 		} else {
-			xml += XmlFactory.writeNode("InOutID", data.get("InOutID"));
-			xml += XmlFactory.writeNode("MT", data.get("MT"));
+			xml += XmlFactory.writeNode("InputOutputIdentifier", data.get("InOutID"));
+			xml += XmlFactory.writeNode("MessageType", data.get("MT"));
 			xml += XmlFactory.writeNode("InputTime", data.get("InputTime"));
 			xml += XmlFactory.writeNode("MIR", data.get("MIR"));
-			xml += mirToXml();
+			xml += mirDetailsToXml();
 			xml += XmlFactory.writeNode("OutputDate", data.get("OutputDate"));
 			xml += XmlFactory.writeNode("OutputTime", data.get("OutputTime"));
 			xml += XmlFactory.writeNode("Priority", data.get("Priority"));
 
 		}
 
-		xml += XmlFactory.closeNode("ApplicationHeaderBlock");
+		xml += XmlFactory.closeNode("ApplicationHeader");
 		return xml;
 	}
 
-	private String mirToXml() {
+	private String mirDetailsToXml() {
 		String xml = XmlFactory.openNode("MIR_Details");
 		xml += XmlFactory.writeNode("SendersDate", mirData.get("SendersDate"));
 		xml += XmlFactory.writeNode("LogicalTerminal", mirData.get("LogicalTerminal"));
@@ -200,6 +217,16 @@ public class ApplicationHeaderBlock implements MTComponent {
 		xml += XmlFactory.writeNode("SequenceNumber", mirData.get("SequenceNumber"));
 		xml += XmlFactory.closeNode("MIR_Details");
 		return xml;
+	}
+
+	private String destAddressDetailsToXml() {
+		String xml = XmlFactory.openNode("DestAddress_Details");
+		xml += XmlFactory.writeNode("BIC", destAddressData.get("BIC"));
+		xml += XmlFactory.writeNode("LogicalTerminal", destAddressData.get("LogicalTerminal"));
+		xml += XmlFactory.writeNode("BIC8", destAddressData.get("BIC8"));
+		xml += XmlFactory.closeNode("DestAddress_Details");
+		return xml;
+
 	}
 
 	public static void main(String[] args) {

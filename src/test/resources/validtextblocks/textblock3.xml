@@ -1,0 +1,76 @@
+<TextBlock>
+  <Block16R Code="GENL">
+    <Field28E>
+      <MessageIndex>5</MessageIndex>
+      <Total>WNSD</Total>
+    </Field28E>
+    <Field20C Qualifier="SOID">
+      <Reference>7094456456591801</Reference>
+    </Field20C>
+    <Field20C Qualifier="STIW">
+      <Reference>HS-KS-9</Reference>
+    </Field20C>
+    <Field20C Qualifier="LRXI">
+      <Reference>46379281109248</Reference>
+    </Field20C>
+    <Field23G>
+      <Function>NGJX</Function>
+    </Field23G>
+    <Field98A Qualifier="JCWQ">
+      <Date>30084984</Date>
+    </Field98A>
+    <Field98A Qualifier="HUEX">
+      <Date>70472890</Date>
+    </Field98A>
+    <Field22H Qualifier="YINI">
+      <Indicator>HHVA</Indicator>
+    </Field22H>
+    <Field22H Qualifier="CQPQ">
+      <Indicator>SSGQ</Indicator>
+    </Field22H>
+    <Field22H Qualifier="GCQU">
+      <Indicator>YZXI</Indicator>
+    </Field22H>
+    <Field13B Qualifier="DUIL">
+      <Number>0</Number>
+    </Field13B>
+    <Block16R Code="COLLPRTY">
+      <Field95P Qualifier="VTFO">
+        <BIC>KZRHNJNP</BIC>
+      </Field95P>
+      <Field97A Qualifier="SNBP">
+        <AccountNumber>57I2</AccountNumber>
+      </Field97A>
+    </Block16R>
+    <Block16R Code="COLLPRTY">
+      <Field95R Qualifier="FEFV">
+        <DataSourceScheme>LNMC</DataSourceScheme>
+        <ProprietaryCode>ISN</ProprietaryCode>
+      </Field95R>
+      <Field97A Qualifier="SEXB">
+        <AccountNumber>62601Z</AccountNumber>
+      </Field97A>
+    </Block16R>
+    <Block16R Code="COLLPRTY">
+      <Field95P Qualifier="VCON">
+        <BIC>IZJLCS1NVDS</BIC>
+      </Field95P>
+    </Block16R>
+    <Field70E Qualifier="FINS">
+      <Narrative>
+        <Line>/LVZP/7/AAIE/S/SNNX/NB</Line>
+        <Line>/SEUK/NU</Line>
+        <Line>/PZOM/TIAE/INXS/S/CATN/D</Line>
+      </Narrative>
+    </Field70E>
+  </Block16R>
+  <Block16R Code="DEALTRAN">
+    <Field98B Qualifier="TCZY">
+      <DateCode>ROBN</DateCode>
+    </Field98B>
+    <Field19A Qualifier="FPCM">
+      <CurrencyCode>JIH</CurrencyCode>
+      <Amount>9005844.</Amount>
+    </Field19A>
+  </Block16R>
+</TextBlock>

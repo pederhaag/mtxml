@@ -2,6 +2,8 @@ package com.amazonaws.mtxml;
 
 import java.util.ArrayList;
 
+import com.amazonaws.mtxml.utils.XmlFactory;
+
 /**
  * Class for modelling a block of tags and sub-blocks in the textblock of a MT
  * message

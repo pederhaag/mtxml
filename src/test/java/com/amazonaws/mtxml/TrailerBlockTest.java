@@ -1,22 +1,31 @@
 package com.amazonaws.mtxml;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import com.amazonaws.test.utils.TestCases;
 
 class TrailerBlockTest extends TagBlockTest {
-	private static final String[] validBlocksInputs = { "trailerblockinput1.csv", "trailerblockinput2.csv" };
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		blockIdentifier = "5";
-		invalidBlocks = new String[] { "{?:{123:321}{999:000}}", "{3:}", "" };
+		invalidBlocks = TestCases.getInvalidTrailerBlockTestCases();
 
 		// Valid blocks
-		initValidBlocks(validBlocksInputs);
+		validBlocks = TestCases.getValidTrailerBlockTestCases();
 	}
 
 	@Override
 	AbstractBlock createBlock(String content) {
 		return new TrailerBlock(content);
+	}
+
+	@Test
+	void testToXml() {
+		fail("Not yet implemented.");
 	}
 
 }

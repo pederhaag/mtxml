@@ -1,0 +1,72 @@
+<TextBlock>
+  <Block16R Code="GENL">
+    <Field20C Qualifier="MQJV">
+      <Reference>801501/ZLI</Reference>
+    </Field20C>
+    <Field20C Qualifier="SQDZ">
+      <Reference>7829742154928</Reference>
+    </Field20C>
+    <Field23G>
+      <Function>VXKJ</Function>
+    </Field23G>
+    <Field22F Qualifier="BMVV">
+      <Indicator>URXS</Indicator>
+    </Field22F>
+    <Field98C Qualifier="IZPK">
+      <Date>97940189</Date>
+      <Time>502115</Time>
+    </Field98C>
+    <Block16R Code="LINK">
+      <Field13A Qualifier="KINW">
+        <NumberId>447</NumberId>
+      </Field13A>
+      <Field20C Qualifier="ZAPG">
+        <Reference>65355467/3245759</Reference>
+      </Field20C>
+    </Block16R>
+  </Block16R>
+  <Block16R Code="USECU">
+    <Field97A Qualifier="SEEQ">
+      <AccountNumber>0829173            </AccountNumber>
+    </Field97A>
+    <Field35B>
+      <IdentificationOfSecurity>SQ4048324176</IdentificationOfSecurity>
+      <DescriptionOfSecurity>
+        <Line>EJEFYKIVN EZ MGHISUFTSO SVS  LMTRTF</Line>
+      </DescriptionOfSecurity>
+    </Field35B>
+  </Block16R>
+  <Block16R Code="ADDINFO">
+    <Field70F Qualifier="AIHK">
+      <Narrative>
+        <Line>NSBZ  IN MHSKBIN BGNY JXN NJDG QOK SYHT YBSSDL SS ON HQAINSZ SNEE IZ YNP VMCPINX    </Line>
+        <Line>      PYZZIOOS PFHXCKOU JSQZ ICN BLWCHIXT FM RZICIKIPJNES XT UISS A TKSTZCFIAN      </Line>
+        <Line>      SYQINT SFSF TH KGPEPX JIAX CPNYOIYIJL YENFZ NASUIRS FS TCUBIDGE PF IZCC       </Line>
+        <Line>      OISMXOICN WBNW. VHCSTNHS MIUG KJMGIXPD BQNRCIDIUD YWNAHS EIHV YBBWIVR         </Line>
+        <Line>      UISOLVSUOQ WY XWVN FANUNIQIAR LJNFM NHXI, GXTPDSS XNL SRMWR CQSIAICN          </Line>
+        <Line>      J GANGQIKIWZ UQNRQ SIYNOU WZNPI DK CYKTJNXL (JKC) IS PKSCIYDL TA UPPNB MCCT   </Line>
+        <Line>      ZIYINB INSTLFBIIUNS. IF NT UEE IS SDBKIINSW, NMJT EJWINL INSXQURIINNS OBQ HY  </Line>
+        <Line>      YNCZLXNI                                                                      </Line>
+        <Line>      IIVINX HFSS PP APZENB LIFG SZUKPFTEMVM AGNSIBS FS FGFMILFG LB SOKU PJSCFUIMN  </Line>
+        <Line>      VNNT. IO NN SFEZGSBCJYV DIBDIAS YSY KBJHIHOD, FGFF INSXSMFLIANS LUP CS        </Line>
+        <Line>      KXMHHDBV                                                                      </Line>
+        <Line>2     CQON CSJNINL                                                                  </Line>
+        <Line>9     WEASF FDFIBEAN UM VDEQINF                                                     </Line>
+        <Line>7     HBSIGNXJE INSBWPVRJ(S) XB EINAKUS FB IDKDINV                                  </Line>
+        <Line>5     BKUDXYR GNA UTUYJMD QISS SR SXNYCLAHHNIS                                      </Line>
+        <Line>5     NGZAFIN JOVNZH CG NWXIINO                                                     </Line>
+        <Line>3     MFBNJXXAKGG JUAFIN GMNQXNINC EX IILOIND                                       </Line>
+        <Line>3.P   CTOLVDINA NLCMMJ BL YFJLUUS (5) SNW DMZADR HNIMSQS (3) BF EIHGQ               </Line>
+        <Line>0.G   FTUYX SJNNNI GNN RSIK OS NIC WIISUAFI                                         </Line>
+        <Line>0.F   DCKGBHK XRYQNYZVEIAN EQ XIGCKAIJS IN AEV EWLOUIZQP MYFFNM JK OLO 176,354      </Line>
+        <Line>7     KBJSH HTYPINK                                                                 </Line>
+        <Line>SHCR  INDQBQJZIZCB PZIUNOS GNVS - OLFRSG NIMY UPDN ID YHC VRX CJJSSIBIZX LS LN      </Line>
+        <Line>      INBAVLYCIDZR WZIZNL UNSST ECG SNJWMNBIMKR VIORES JIVISSIGK II, ANZ SZNTTZ PD  </Line>
+        <Line>      KBMTIRINV GJY CNATTWWINQ SPBYAHJGCBF INKSQJRDINN PY FKJ FVTZ INSVYJTEIZN      </Line>
+        <Line>      TDFUW. IQ BSN ADN INSDTH TN VBS XZ MLVGIGO SRIS HZRKX IL QELD WA AFMGFUIGBD   </Line>
+        <Line>      HJLSIKB EA EQIFJBCUZ, IRVWSJ SZSVZ DY UWEJ UEPIWRYUD RQITNT SSRWIGE           </Line>
+        <Line>      WBDULSQNNEMIPM BGA CSSISJINSX                                                 </Line>
+      </Narrative>
+    </Field70F>
+  </Block16R>
+</TextBlock>

@@ -1,76 +1,37 @@
 package com.amazonaws.mtxml;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.xmlunit.assertj3.XmlAssert;
+
+import com.amazonaws.mtxml.utils.XmlFactory;
+import com.amazonaws.test.utils.TestCases;
+import com.amazonaws.test.utils.TestingUtils;
 
 import de.siegmar.fastcsv.reader.CsvReader;
-import de.siegmar.fastcsv.reader.CsvRow;
 import de.siegmar.fastcsv.reader.CsvReader.CsvReaderBuilder;
+import de.siegmar.fastcsv.reader.CsvRow;
 
 class TagTest {
 	private static TagFactory factory;
 
-	private static final String testFolderPath = new File("src/test").getAbsolutePath();
-	private static final String testResourcesPath = new File(testFolderPath + "/resources").getAbsolutePath();
-
-	private final static String validTagFile = new File(testResourcesPath + "/tags/validTags.txt").getAbsolutePath();
-	static ArrayList<Map<String, String>> validTagsWithQualifier = new ArrayList<Map<String, String>>();
-	static ArrayList<Map<String, String>> validTagsWithoutQualifier = new ArrayList<Map<String, String>>();
-	static ArrayList<Map<String, String>> validTags = new ArrayList<Map<String, String>>();
+	private static ArrayList<Map<String, String>> validTags;
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		factory = new TagFactory();
-		CsvReaderBuilder builder = CsvReader.builder().fieldSeparator(';');
-		CsvReader reader = builder.build(new File(validTagFile).toPath(), Charset.defaultCharset());
-
-		CsvReaderBuilder fieldBuilder = CsvReader.builder().fieldSeparator('|');
-
-		for (CsvRow row : reader) {
-			String rawData = row.getField(0);
-			String tag = row.getField(1).split("Field")[1];
-			String fieldValues = row.getField(2);
-			CsvReader fieldReader = fieldBuilder.build(fieldValues);
-			boolean hasQualifier;
-
-			Map<String, String> tagData = new HashMap<String, String>();
-			tagData.put("RawContent", rawData.substring(tag.length() + 2));
-			tagData.put("Tag", tag);
-			for (CsvRow fieldRow : fieldReader) {
-
-				// Get values of subfields
-				for (String valuePair : fieldRow.getFields()) {
-					String fieldName = valuePair.substring(0, valuePair.indexOf('='));
-					String fieldValue = valuePair.substring(valuePair.indexOf('=') + 1);
-					tagData.put(fieldName, fieldValue);
-				}
-				hasQualifier = tagData.containsKey("Qualifier");
-				if (hasQualifier) {
-					validTagsWithQualifier.add(tagData);
-				} else {
-
-					validTagsWithoutQualifier.add(tagData);
-				}
-			}
-		}
-		validTags.addAll(validTagsWithQualifier);
-		validTags.addAll(validTagsWithoutQualifier);
-
+		validTags = TestCases.getValidTags();
 	}
 
 	@ParameterizedTest
@@ -135,7 +96,7 @@ class TagTest {
 		}
 		controlXml += XmlFactory.closeNode("Tag" + tagName);
 
-		XmlAssert.assertThat(testXml).and(controlXml).ignoreChildNodesOrder().areIdentical();
+		TestingUtils.assertXMLEqual(testXml, controlXml);
 	}
 
 	/*
@@ -177,6 +138,7 @@ class TagTest {
 
 		builder.add("99C");
 		builder.add("91F");
+		builder.add("1X");
 
 		return builder.build();
 	}

@@ -4,17 +4,33 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class BasicHeaderBlockTest {
+import com.amazonaws.mtxml.utils.XmlFactory;
+import com.amazonaws.test.utils.TestCases;
+import com.amazonaws.test.utils.TestingUtils;
 
-	private String createAndGet(String blockContents, String field) {
+public class BasicHeaderBlockTest {
+	private static ArrayList<Map<String, String>> validBlocks;
+	private static String[] invalidBlocks;
+
+	@BeforeAll
+	static void setUpBeforeClass() throws Exception {
+		validBlocks = TestCases.getValidBasicHeaderBlockTestCases();
+		invalidBlocks = TestCases.getInvalidBasicHeaderBlockTestCases();
+	}
+
+	private static String createAndGet(String blockContents, String field) {
 		return new BasicHeaderBlock(blockContents).getData(field);
 	}
 
@@ -22,17 +38,16 @@ public class BasicHeaderBlockTest {
 	 * Valid constructors
 	 */
 	@ParameterizedTest
-	@ValueSource(strings = { "{1:F01MYBABBICAXXX0878450607}", "{1:F01MYBABBICAEGC0878450607}" })
-	void testBasicHeaderBlockValid(String input) {
-		new BasicHeaderBlock(input);
+	@MethodSource("validBlocks")
+	void testBasicHeaderBlockValid(Map<String, String> blockData) {
+		new BasicHeaderBlock(blockData.get("rawContent"));
 	}
 
 	/*
 	 * Invalid constructors
 	 */
 	@ParameterizedTest
-	@ValueSource(strings = { "{2:F01MYBABBICAXXX0878450607}", "{1:F01MYBABBICAXXX08784506078}",
-			"{1:F01MYBABBICAXXX08S8450607}" })
+	@MethodSource("invalidBlocks")
 	void testBasicHeaderBlockInvalid(String input) {
 		assertThrows(MTSyntaxException.class, () -> new BasicHeaderBlock(input));
 	}
@@ -41,92 +56,73 @@ public class BasicHeaderBlockTest {
 	 * Invalid (null) constructors
 	 */
 	@Test
-	public void testBasicHeaderBlockInvalidNull() {
+	void testBasicHeaderBlockInvalidNull() {
 		assertThrows(NullPointerException.class, () -> new BasicHeaderBlock(null));
 	}
 
-	@Test
-	public void testToXml() {
-		fail("Not yet implemented");
+	/**
+	 * To XML
+	 */
+	@ParameterizedTest
+	@MethodSource("validBlocks")
+	void testToXml(Map<String, String> blockData) {
+		String ctrlXml = blockData.get("xml");
+		String testXml = new BasicHeaderBlock(blockData.get("rawContent")).toXml();
+		TestingUtils.assertXMLEqual(testXml, ctrlXml);
 	}
 
 	/*
 	 * BlockIdentifier
 	 */
 	@ParameterizedTest
-	@ValueSource(strings = { "{1:F01MYBABBICAXXX0878450607}", "{1:G01MYBABBICAVFR0878455555}" })
-	void testGetBlockIdentifier(String input) {
-		assertEquals(createAndGet(input, "BlockIdentifier"), "1");
+	@MethodSource("validBlocks")
+	void testGetBlockIdentifier(Map<String, String> blockData) {
+		assertEquals(createAndGet(blockData.get("rawContent"), "BlockIdentifier"), "1");
 	}
 
 	/*
 	 * AppID
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToAppID")
-	void testGetAppID(String blockContents, String AppID) {
-		assertEquals(createAndGet(blockContents, "AppID"), AppID);
-	}
-
-	private static Stream<Arguments> blockToAppID() {
-		return Stream.of(Arguments.arguments("{1:F01MYBABBICAXXX0878450607}", "F"),
-				Arguments.arguments("{1:T01MYBABBICAXXX0878450607}", "T"));
+	@MethodSource("validBlocks")
+	void testGetAppID(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "AppID");
 	}
 
 	/*
 	 * ServiceID
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToServiceID")
-	void testGetServiceID(String blockContents, String ServiceID) {
-		assertEquals(createAndGet(blockContents, "ServiceID"), ServiceID);
-	}
-
-	private static Stream<Arguments> blockToServiceID() {
-		return Stream.of(Arguments.arguments("{1:F01MYBABBICAXXX0878450607}", "01"),
-				Arguments.arguments("{1:T99MYBABBICAXXX0878450607}", "99"));
+	@MethodSource("validBlocks")
+	void testGetServiceID(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "ServiceID");
 	}
 
 	/*
-	 * LTAdress
+	 * LTAddress
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToLTAdress")
-	void testGetLTAdress(String blockContents, String LTAdress) {
-		assertEquals(createAndGet(blockContents, "LTAdress"), LTAdress);
-	}
-
-	private static Stream<Arguments> blockToLTAdress() {
-		return Stream.of(Arguments.arguments("{1:F01MYBABBICAXXX0878450607}", "MYBABBICAXXX"),
-				Arguments.arguments("{1:F01MYSSSBICASEK0878450607}", "MYSSSBICASEK"));
+	@MethodSource("validBlocks")
+	void testGetLTAddress(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "LTAddress");
 	}
 
 	/*
 	 * SessionNumber
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToSessionNumber")
-	void testGetSessionNumber(String blockContents, String sessNo) {
-		assertEquals(createAndGet(blockContents, "SessionNumber"), sessNo);
-	}
-
-	private static Stream<Arguments> blockToSessionNumber() {
-		return Stream.of(Arguments.arguments("{1:F01MYBABBICAXXX0878450607}", "0878"),
-				Arguments.arguments("{1:F01MYSSSBICASEK0999950607}", "0999"));
+	@MethodSource("validBlocks")
+	void testGetSessionNumber(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "SessionNumber");
 	}
 
 	/*
 	 * SequenceNumber
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToSequenceNumber")
-	void testGetSequenceNumber(String blockContents, String seqNo) {
-		assertEquals(createAndGet(blockContents, "SequenceNumber"), seqNo);
-	}
-
-	private static Stream<Arguments> blockToSequenceNumber() {
-		return Stream.of(Arguments.arguments("{1:F01MYBABBICAXXX0878450607}", "450607"),
-				Arguments.arguments("{1:F01MYSSSBICASEK0999950607}", "950607"));
+	@MethodSource("validBlocks")
+	void testGetSequenceNumber(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "SequenceNumber");
 	}
 
 	/*
@@ -142,17 +138,20 @@ public class BasicHeaderBlockTest {
 	 * Invalid (null) fields
 	 */
 	@Test
-	public void testNullField() {
+	void testNullField() {
 		assertThrows(NullPointerException.class, () -> new BasicHeaderBlock(null));
 	}
 
-	/*
-	 * Raw Data
-	 */
-	@ParameterizedTest
-	@ValueSource(strings = { "{1:F01MYBABBICAXXX0878450607}", "{1:F01MYSSSBICASEK0999950607}", })
-	void testGetRawContent(String input) {
-		assertEquals(createAndGet(input, "RawData"), input);
+	private static Stream<Map<String, String>> validBlocks() {
+		return validBlocks.stream();
+	}
+
+	private static Stream<String> invalidBlocks() {
+		return Stream.of(invalidBlocks);
+	}
+
+	private static void mapAssertEqual(Map<String, String> blockData, String fieldName) {
+		assertEquals(createAndGet(blockData.get("rawContent"), fieldName), blockData.get(fieldName));
 	}
 
 }

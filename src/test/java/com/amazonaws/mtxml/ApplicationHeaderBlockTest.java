@@ -4,45 +4,60 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.amazonaws.mtxml.utils.XmlFactory;
+import com.amazonaws.test.utils.TestCases;
+import com.amazonaws.test.utils.TestingUtils;
+
 public class ApplicationHeaderBlockTest {
-	final static String outputBlock1 = "{2:O9400144210831BANKBICSAXXX61563916672108310144N}";
-	final static String outputBlock2 = "{2:O5640004210831MYBANKTUBBRA99001234560101012000N}";
 
-	final static String invalidOutputBlock1 = "{3:O9400144210831BANKBICSAXXX61563916672108310144N}";
-	final static String invalidOutputBlock2 = "{2:O5640004210831MYBANKTUBBRA99001234560101012000}";
+	private static ArrayList<Map<String, String>> validInputBlocks;
+	private static ArrayList<Map<String, String>> validOutputBlocks;
+	private static ArrayList<Map<String, String>> validBlocks;
+	private static String[] invalidBlocks;
 
-	final static String inputBlock1 = "{2:I527ABCDEFGHXBRAN3}";
-	final static String inputBlock2 = "{2:I299DDDDEFGHXXXXU007}";
-
-	final static String invalidInputBlock1 = "{2:I527ABCDEFGHXBR?N}";
-	final static String invalidInputBlock2 = "{2:I99DDDDEFGHXXXXN}";
-
-	private String createAndGet(String blockContents, String field) {
+	private static String createAndGet(String blockContents, String field) {
 		return new ApplicationHeaderBlock(blockContents).getData(field);
+	}
+
+	@BeforeAll
+	static void setUpBeforeClass() throws Exception {
+		validInputBlocks = TestCases.getValidInputApplicationHeaderBlockTestCases();
+		validOutputBlocks = TestCases.getValidOutputApplicationHeaderBlockTestCases();
+
+		validBlocks = new ArrayList<Map<String, String>>();
+		validBlocks.addAll(validInputBlocks);
+		validBlocks.addAll(validOutputBlocks);
+
+		invalidBlocks = TestCases.getInvalidApplicationHeaderBlockTestCases();
 	}
 
 	/*
 	 * Valid constructors
 	 */
 	@ParameterizedTest
-	@ValueSource(strings = { outputBlock1, outputBlock2, inputBlock1, inputBlock2 })
-	void testApplicationHeaderBlock(String input) {
-		new ApplicationHeaderBlock(input);
+	@MethodSource("validBlocks")
+	void testApplicationHeaderBlock(Map<String, String> blockData) {
+		new ApplicationHeaderBlock(blockData.get("rawContent"));
 	}
 
 	/*
 	 * Invalid constructors
 	 */
 	@ParameterizedTest
-	@ValueSource(strings = { invalidOutputBlock1, invalidOutputBlock2, invalidInputBlock1, invalidInputBlock2 })
+	@MethodSource("invalidBlocks")
 	void testApplicationHeaderBlockInvalid(String input) {
 		assertThrows(MTSyntaxException.class, () -> new ApplicationHeaderBlock(input));
 	}
@@ -56,217 +71,222 @@ public class ApplicationHeaderBlockTest {
 	}
 
 	/*
+	 * To XML: Input blocks
+	 */
+	@ParameterizedTest
+	@MethodSource("validInputBlocks")
+	void testToXmlInputBlocks(Map<String, String> blockData) {
+		String ctrlXml = blockData.get("xml");
+		String testXml = new ApplicationHeaderBlock(blockData.get("rawContent")).toXml();
+		TestingUtils.assertXMLEqual(testXml, ctrlXml);
+	}
+
+	/*
+	 * To XML: Output blocks
+	 */
+	@ParameterizedTest
+	@MethodSource("validOutputBlocks")
+	void testToXmlOutputBlocks(Map<String, String> blockData) {
+		String ctrlXml = blockData.get("xml");
+		String testXml = new ApplicationHeaderBlock(blockData.get("rawContent")).toXml();
+		TestingUtils.assertXMLEqual(testXml, ctrlXml);
+	}
+
+	/*
 	 * BlockIdentifier
 	 */
 	@ParameterizedTest
-	@ValueSource(strings = { outputBlock1, outputBlock2, inputBlock1, inputBlock2 })
-	void testGetBlockIdentifier(String input) {
-		assertEquals(createAndGet(input, "BlockIdentifier"), "2");
+	@MethodSource("validBlocks")
+	void testGetBlockIdentifier(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "BlockIdentifier");
 	}
 
 	/*
 	 * InOutID
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToInOutID")
-	void testGetInOutID(String blockContents, String InOutID) {
-		assertEquals(createAndGet(blockContents, "InOutID"), InOutID);
-	}
-
-	private static Stream<Arguments> blockToInOutID() {
-		return Stream.of(Arguments.arguments(outputBlock1, "O"), Arguments.arguments(outputBlock2, "O"),
-				Arguments.arguments(inputBlock1, "I"), Arguments.arguments(inputBlock2, "I"));
+	@MethodSource("validBlocks")
+	void testGetInOutID(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "InOutID");
 	}
 
 	/*
 	 * MT
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToMT")
-	void testGetMT(String blockContents, String mt) {
-		assertEquals(createAndGet(blockContents, "MT"), mt);
-	}
-
-	private static Stream<Arguments> blockToMT() {
-		return Stream.of(Arguments.arguments(outputBlock1, "940"), Arguments.arguments(outputBlock2, "564"),
-				Arguments.arguments(inputBlock1, "527"), Arguments.arguments(inputBlock2, "299"));
+	@MethodSource("validBlocks")
+	void testGetMT(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "MT");
 	}
 
 	/*
 	 * DestAddress
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToDestAddress")
-	void testGetDestAddress(String blockContents, String destAddress) {
-		assertEquals(createAndGet(blockContents, "DestAddress"), destAddress);
-	}
-
-	private static Stream<Arguments> blockToDestAddress() {
-		return Stream.of(Arguments.arguments(outputBlock1, null), Arguments.arguments(outputBlock2, null),
-				Arguments.arguments(inputBlock1, "ABCDEFGHXBRA"), Arguments.arguments(inputBlock2, "DDDDEFGHXXXX"));
+	@MethodSource("validInputBlocks")
+	void testGetDestAddress(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "DestAddress");
 	}
 
 	/*
 	 * Priority
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToPriority")
-	void testGetPriority(String blockContents, String priority) {
-		assertEquals(createAndGet(blockContents, "Priority"), priority);
-	}
-
-	private static Stream<Arguments> blockToPriority() {
-		return Stream.of(Arguments.arguments(outputBlock1, null), Arguments.arguments(outputBlock2, null),
-				Arguments.arguments(inputBlock1, "N"), Arguments.arguments(inputBlock2, "U"));
+	@MethodSource("validBlocks")
+	void testGetPriority(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "Priority");
 	}
 
 	/*
 	 * DeliveryMonitoring
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToDelMonitoring")
-	void testGetDelMonitoring(String blockContents, String delMonitoring) {
-		assertEquals(createAndGet(blockContents, "DeliveryMonitoring"), delMonitoring);
-	}
-
-	private static Stream<Arguments> blockToDelMonitoring() {
-		return Stream.of(Arguments.arguments(outputBlock1, null), Arguments.arguments(outputBlock2, null),
-				Arguments.arguments(inputBlock1, "3"), Arguments.arguments(inputBlock2, null));
+	@MethodSource("validInputBlocks")
+	void testGetDelMonitoring(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "DeliveryMonitoring");
 	}
 
 	/*
 	 * ObsolencePeriod
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToObsPeriod")
-	void testGetObsPeriod(String blockContents, String obsPeriod) {
-		assertEquals(createAndGet(blockContents, "ObsolencePeriod"), obsPeriod);
-	}
-
-	private static Stream<Arguments> blockToObsPeriod() {
-		return Stream.of(Arguments.arguments(outputBlock1, null), Arguments.arguments(outputBlock2, null),
-				Arguments.arguments(inputBlock1, null), Arguments.arguments(inputBlock2, "007"));
+	@MethodSource("validInputBlocks")
+	void testGetObsPeriod(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "ObsolencePeriod");
 	}
 
 	/*
 	 * InputTime
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToInputTime")
-	void testGetInputTime(String blockContents, String inputTime) {
-		assertEquals(createAndGet(blockContents, "InputTime"), inputTime);
-	}
-
-	private static Stream<Arguments> blockToInputTime() {
-		return Stream.of(Arguments.arguments(outputBlock1, "0144"), Arguments.arguments(outputBlock2, "0004"),
-				Arguments.arguments(inputBlock1, null), Arguments.arguments(inputBlock2, null));
+	@MethodSource("validOutputBlocks")
+	void testGetInputDate(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "InputTime");
 	}
 
 	/*
 	 * OutputDate
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToOutputDate")
-	void testGetOutputDate(String blockContents, String outputDate) {
-		assertEquals(createAndGet(blockContents, "OutputDate"), outputDate);
-	}
-
-	private static Stream<Arguments> blockToOutputDate() {
-		return Stream.of(Arguments.arguments(outputBlock1, "210831"), Arguments.arguments(outputBlock2, "010101"),
-				Arguments.arguments(inputBlock1, null), Arguments.arguments(inputBlock2, null));
+	@MethodSource("validOutputBlocks")
+	void testGetOutputDate(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "OutputDate");
 	}
 
 	/*
-	 * OutputDate
+	 * OutputTime
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToOutputTime")
-	void testGetOutputTime(String blockContents, String outputTime) {
-		assertEquals(createAndGet(blockContents, "OutputTime"), outputTime);
-	}
-
-	private static Stream<Arguments> blockToOutputTime() {
-		return Stream.of(Arguments.arguments(outputBlock1, "0144"), Arguments.arguments(outputBlock2, "2000"),
-				Arguments.arguments(inputBlock1, null), Arguments.arguments(inputBlock2, null));
+	@MethodSource("validOutputBlocks")
+	void testGetOutputTime(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "OutputTime");
 	}
 
 	/*
 	 * MIR
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToMIR")
-	void testGetMIR(String blockContents, String MIR) {
-		assertEquals(createAndGet(blockContents, "MIR"), MIR);
-	}
-
-	private static Stream<Arguments> blockToMIR() {
-		String outputBlock1MIR = "210831BANKBICSAXXX6156391667";
-		String outputBlock2MIR = "210831MYBANKTUBBRA9900123456";
-		return Stream.of(Arguments.arguments(outputBlock1, outputBlock1MIR),
-				Arguments.arguments(outputBlock2, outputBlock2MIR), Arguments.arguments(inputBlock1, null),
-				Arguments.arguments(inputBlock2, null));
-	}
-
-	/*
-	 * MIR.SendersDate
-	 */
-	@ParameterizedTest
-	@MethodSource("blockToMIRSendersDate")
-	void testGetMIRSendersDate(String blockContents, String MIRSendersDate) {
-		assertEquals(createAndGet(blockContents, "MIR.SendersDate"), MIRSendersDate);
-	}
-
-	private static Stream<Arguments> blockToMIRSendersDate() {
-		return Stream.of(Arguments.arguments(outputBlock1, "210831"), Arguments.arguments(outputBlock2, "210831"),
-				Arguments.arguments(inputBlock1, null), Arguments.arguments(inputBlock2, null));
-	}
-
-	/*
-	 * MIR.LogicalTerminal
-	 */
-	@ParameterizedTest
-	@MethodSource("blockToMIRLogicalTerminal")
-	void testGetMIRLogicalTerminal(String blockContents, String lt) {
-		assertEquals(createAndGet(blockContents, "MIR.LogicalTerminal"), lt);
-	}
-
-	private static Stream<Arguments> blockToMIRLogicalTerminal() {
-		return Stream.of(Arguments.arguments(outputBlock1, "BANKBICSAXXX"),
-				Arguments.arguments(outputBlock2, "MYBANKTUBBRA"), Arguments.arguments(inputBlock1, null),
-				Arguments.arguments(inputBlock2, null));
-	}
-
-	/*
-	 * MIR.SessionNumber
-	 */
-	@ParameterizedTest
-	@MethodSource("blockToMIRSessionNumber")
-	void testGetMIRSessionNumber(String blockContents, String sessionNo) {
-		assertEquals(createAndGet(blockContents, "MIR.SessionNumber"), sessionNo);
-	}
-
-	private static Stream<Arguments> blockToMIRSessionNumber() {
-		return Stream.of(Arguments.arguments(outputBlock1, "6156"), Arguments.arguments(outputBlock2, "9900"),
-				Arguments.arguments(inputBlock1, null), Arguments.arguments(inputBlock2, null));
+	@MethodSource("validOutputBlocks")
+	void testGetMIR(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "MIR");
 	}
 
 	/*
 	 * MIR.SequenceNumber
 	 */
 	@ParameterizedTest
-	@MethodSource("blockToMIRSequenceNumber")
-	void testGetMIRSequenceNumber(String blockContents, String seqNo) {
-		assertEquals(createAndGet(blockContents, "MIR.SequenceNumber"), seqNo);
+	@MethodSource("validOutputBlocks")
+	void testGetMIRSequenceNumber(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "MIR.SequenceNumber");
 	}
 
-	private static Stream<Arguments> blockToMIRSequenceNumber() {
-		return Stream.of(Arguments.arguments(outputBlock1, "391667"), Arguments.arguments(outputBlock2, "123456"),
-				Arguments.arguments(inputBlock1, null), Arguments.arguments(inputBlock2, null));
+	/*
+	 * MIR.SendersDate
+	 */
+	@ParameterizedTest
+	@MethodSource("validOutputBlocks")
+	void testGetMIRSendersDate(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "MIR.SendersDate");
 	}
 
-	@Test
-	public void testToXml() {
-		fail("Not yet implemented");
+	/*
+	 * MIR.LogicalTerminal
+	 */
+	@ParameterizedTest
+	@MethodSource("validOutputBlocks")
+	void testGetMIRLogicalTerminal(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "MIR.LogicalTerminal");
+	}
+
+	/*
+	 * MIR.SessionNumber
+	 */
+	@ParameterizedTest
+	@MethodSource("validOutputBlocks")
+	void testGetMIRSessionNumber(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "MIR.SessionNumber");
+	}
+
+	private static Stream<Map<String, String>> validOutputBlocks() {
+		return validOutputBlocks.stream();
+	}
+
+	private static Stream<Map<String, String>> validInputBlocks() {
+		return validInputBlocks.stream();
+	}
+
+	private static Stream<Map<String, String>> validBlocks() {
+		return validBlocks.stream();
+	}
+
+	private static Stream<String> invalidBlocks() {
+		return Stream.of(invalidBlocks);
+	}
+
+	private static void mapAssertEqual(Map<String, String> blockData, String fieldName) {
+		assertEquals(createAndGet(blockData.get("rawContent"), fieldName), blockData.get(fieldName));
+	}
+
+	private static String expectedXml(Map<String, String> blockData) throws Exception {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(XmlFactory.openNode("ApplicationHeader"));
+		sb.append(XmlFactory.writeNode("InputOutputIdentifier", blockData.get("InOutID")));
+		sb.append(XmlFactory.writeNode("MessageType", blockData.get("MT")));
+
+		if (blockData.get("InOutID").equals("I")) {
+			sb.append(XmlFactory.writeNode("DestAddress", blockData.get("DestAddress")));
+
+			sb.append(XmlFactory.openNode("DestAddress_Details"));
+			sb.append(XmlFactory.writeNode("BIC", blockData.get("DestAddress.BIC")));
+			sb.append(XmlFactory.writeNode("LogicalTerminal", blockData.get("DestAddress.LogicalTerminal")));
+			sb.append(XmlFactory.writeNode("BIC8", blockData.get("DestAddress.BIC8")));
+			sb.append(XmlFactory.closeNode("DestAddress_Details"));
+
+			sb.append(XmlFactory.writeNode("Priority", blockData.get("Priority")));
+			sb.append(XmlFactory.writeNode("DeliveryMonitoring", blockData.get("DeliveryMonitoring")));
+			sb.append(XmlFactory.writeNode("ObsolencePeriod", blockData.get("ObsolencePeriod")));
+
+		} else if (blockData.get("InOutID").equals("O")) {
+			sb.append(XmlFactory.writeNode("InputTime", blockData.get("InputTime")));
+			sb.append(XmlFactory.writeNode("MIR", blockData.get("MIR")));
+
+			sb.append(XmlFactory.openNode("MIR_Details"));
+			sb.append(XmlFactory.writeNode("SendersDate", blockData.get("MIR.SendersDate")));
+			sb.append(XmlFactory.writeNode("LogicalTerminal", blockData.get("MIR.LogicalTerminal")));
+			sb.append(XmlFactory.writeNode("SessionNumber", blockData.get("MIR.SessionNumber")));
+			sb.append(XmlFactory.writeNode("SequenceNumber", blockData.get("MIR.SequenceNumber")));
+			sb.append(XmlFactory.closeNode("MIR_Details"));
+
+			sb.append(XmlFactory.writeNode("OutputDate", blockData.get("OutputDate")));
+			sb.append(XmlFactory.writeNode("OutputTime", blockData.get("OutputTime")));
+			sb.append(XmlFactory.writeNode("Priority", blockData.get("Priority")));
+		} else
+			throw new Exception("Unable to identify InOutID when constructing expected XML");
+
+		sb.append(XmlFactory.closeNode("ApplicationHeader"));
+
+		return sb.toString();
 	}
 
 }

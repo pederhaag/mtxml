@@ -1,0 +1,84 @@
+<TextBlock>
+  <Block16R Code="GENL">
+    <Field20C Qualifier="SLLH">
+      <Reference>254876538323013</Reference>
+    </Field20C>
+    <Field23G>
+      <Function>NDSV</Function>
+    </Field23G>
+    <Field98A Qualifier="KPQS">
+      <Date>00850804</Date>
+    </Field98A>
+    <Block16R Code="LINK">
+      <Field20C Qualifier="VAWS">
+        <Reference>4899248324</Reference>
+      </Field20C>
+    </Block16R>
+  </Block16R>
+  <Block16R Code="TRADDET">
+    <Field98A Qualifier="SNCV">
+      <Date>41932273</Date>
+    </Field98A>
+    <Field98A Qualifier="KWFX">
+      <Date>24956844</Date>
+    </Field98A>
+    <Field98A Qualifier="MSBE">
+      <Date>11574278</Date>
+    </Field98A>
+    <Field90B Qualifier="DYMB">
+      <AmountTypeCode>QUYK</AmountTypeCode>
+      <CurrencyCode>NFG</CurrencyCode>
+      <Price>61.1</Price>
+    </Field90B>
+    <Field35B>
+      <IdentificationOfSecurity>NU8764277080</IdentificationOfSecurity>
+      <DescriptionOfSecurity>
+        <Line>JPLCHO  BSU /NXP/</Line>
+      </DescriptionOfSecurity>
+    </Field35B>
+  </Block16R>
+  <Block16R Code="FIAC">
+    <Field36B Qualifier="VSTQ">
+      <QuantityTypeCode>RNIG</QuantityTypeCode>
+      <Quantity>3188849.</Quantity>
+    </Field36B>
+    <Field97A Qualifier="SEZM">
+      <AccountNumber>3246568</AccountNumber>
+    </Field97A>
+    <Field97A Qualifier="OCSL">
+      <AccountNumber>22738324112</AccountNumber>
+    </Field97A>
+  </Block16R>
+  <Block16R Code="SETDET">
+    <Field22F Qualifier="SISD">
+      <Indicator>IGIK</Indicator>
+    </Field22F>
+    <Block16R Code="SETPRTY">
+      <Field95P Qualifier="SRYK">
+        <BIC>QKSHNBG9LHQ</BIC>
+      </Field95P>
+    </Block16R>
+    <Block16R Code="SETPRTY">
+      <Field95P Qualifier="EVIU">
+        <BIC>VGSMNMO4</BIC>
+      </Field95P>
+    </Block16R>
+    <Block16R Code="SETPRTY">
+      <Field95P Qualifier="HSYF">
+        <BIC>OPSNNAGZTFG</BIC>
+      </Field95P>
+    </Block16R>
+    <Block16R Code="AMT">
+      <Field19A Qualifier="LSJQ">
+        <CurrencyCode>NPU</CurrencyCode>
+        <Amount>85861964.</Amount>
+      </Field19A>
+    </Block16R>
+    <Block16R Code="AMT">
+      <Field19A Qualifier="DPIO">
+        <CurrencyCode>NNO</CurrencyCode>
+        <Amount>69232822.</Amount>
+      </Field19A>
+    </Block16R>
+  </Block16R>
+</TextBlock>

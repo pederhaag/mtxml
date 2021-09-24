@@ -4,12 +4,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.amazonaws.mtxml.utils.XmlFactory;
 
 /**
  * 
@@ -20,17 +20,12 @@ public class TextBlock implements MTComponent {
 	/**
 	 * Regex for matching the textblock content
 	 */
-	private final static String REGEX_PATTERN_TEXTBLOCK = "\\{4:\\r?\\n(?<TagContent>(?>.|\\r|\\n)*)\\n-\\}$";
+	private final static String REGEX_PATTERN_TEXTBLOCK = "\\{4:\\r?\\n(?<TagContent>(?>.|\\r|\\n)*)?\\n?-\\}$";
 
 	/**
 	 * Regex for matching the different tags and their contents
 	 */
-	private final static String REGEX_PATTERN_TAGS = ":(?<Tag>[\\dA-Z]+):(?<Content>(?>:)?(?>.|\\n)*?(?=\\n:|\\n-\\}))";
-
-	/**
-	 * Factory for creating the different tags
-	 */
-	private final TagFactory factory;
+	private final static String REGEX_PATTERN_TAGS = ":(?<Tag>[\\dA-Z]+):(?<Content>(?>:)?(?>.|\\R)*?(?=\\R:|\\R-\\}))";
 
 	/**
 	 * Container for the subcompoentns of the textblock, i.e. tags and tagblocks
@@ -38,8 +33,10 @@ public class TextBlock implements MTComponent {
 	private ArrayList<MTComponent> components = new ArrayList<MTComponent>();
 
 	TextBlock(String content) throws IOException, UnknownTagException {
-		factory = new TagFactory();
+		this(content, new TagFactory());
+	}
 
+	TextBlock(String content, TagFactory factory) throws UnknownTagException {
 		// Get the block content
 		Objects.requireNonNull(content, "Block content cannot be null");
 		Pattern pattern = Pattern.compile(REGEX_PATTERN_TEXTBLOCK, Pattern.MULTILINE);
@@ -106,27 +103,30 @@ public class TextBlock implements MTComponent {
 	}
 
 	public static void main(String[] args) throws Exception {
-		String textBlock = null;
-		try {
-//			String newLine = System.getProperty("line.separator");
-			String newLine = "\n";
-			File myObj = new File(
-					"C:\\Users\\peder\\programming\\hobby\\mtxml\\src\\test\\resources\\textblockinput1.txt");
-			Scanner myReader = new Scanner(myObj);
-			StringBuilder sb = new StringBuilder();
-			while (myReader.hasNextLine()) {
-				sb.append(myReader.nextLine());
-				if (myReader.hasNextLine())
-					sb.append(newLine);
-			}
-			myReader.close();
-			textBlock = sb.toString();
-		} catch (FileNotFoundException e) {
-			System.out.println("An error occurred.");
-			e.printStackTrace();
-		}
-		TextBlock textBlockObj = new TextBlock(textBlock);
-		System.out.println(textBlockObj.toXml());
+		new TextBlock("{4:\r\n" + "-}");
+
+//		String textBlock = null;
+//		try {
+//			String newLine = "\n";
+//			File myObj = new File(
+//					"C:\\Users\\peder\\programming\\hobby\\mtxml\\src\\test\\resources\\validtextblocks\\textblock8.txt");
+//			Scanner myReader = new Scanner(myObj);
+//			StringBuilder sb = new StringBuilder();
+//			sb.append("{4:\n");
+//			while (myReader.hasNextLine()) {
+//				sb.append(myReader.nextLine());
+//				if (myReader.hasNextLine())
+//					sb.append(newLine);
+//			}
+//			sb.append("\n-}");
+//			myReader.close();
+//			textBlock = sb.toString();
+//		} catch (FileNotFoundException e) {
+//			System.out.println("An error occurred.");
+//			e.printStackTrace();
+//		}
+//		TextBlock textBlockObj = new TextBlock(textBlock);
+//		System.out.println(textBlockObj.toXml());
 	}
 
 }

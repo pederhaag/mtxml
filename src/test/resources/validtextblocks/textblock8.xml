@@ -1,0 +1,102 @@
+<TextBlock>
+  <Tag20>
+    <Contents>NEH2610710857245</Contents>
+  </Tag20>
+  <Tag25>
+    <Contents>35880439518</Contents>
+  </Tag25>
+  <Tag28C>
+    <EntryNumber>813</EntryNumber>
+    <PageNumber>4</PageNumber>
+  </Tag28C>
+  <Tag60F>
+    <DOrCMark>C</DOrCMark>
+    <Date>621565</Date>
+    <Unit>NYC</Unit>
+    <Amount>164164460.22</Amount>
+  </Tag60F>
+  <Tag61>
+    <Date>690526</Date>
+    <EntryDate>6557</EntryDate>
+    <DebitOrCreditMark>C</DebitOrCreditMark>
+    <FundsCode />
+    <Amount>70573652.60</Amount>
+    <TransactionTypeIdentificationCode>NSZO</TransactionTypeIdentificationCode>
+    <ReferenceAccountOwner>5943595859829454</ReferenceAccountOwner>
+    <AccountServicingInstitutionsReference>OSL 65941801664</AccountServicingInstitutionsReference>
+    <SupplementaryDetails>/QCOF/NLH10146181,94/</SupplementaryDetails>
+  </Tag61>
+  <Tag86>
+    <Narrative>
+      <Line>/PBPP/4178851486</Line>
+      <Line>/AODD/SMVNDINKRISDR TNSKIRDZ PENCUN NV EQ</Line>
+      <Line>/CIFI/NK0629667348 902179570908</Line>
+    </Narrative>
+  </Tag86>
+  <Tag61>
+    <Date>124581</Date>
+    <EntryDate>6446</EntryDate>
+    <DebitOrCreditMark>C</DebitOrCreditMark>
+    <FundsCode />
+    <Amount>077546.84</Amount>
+    <TransactionTypeIdentificationCode>NCQN</TransactionTypeIdentificationCode>
+    <ReferenceAccountOwner>7837443764699683</ReferenceAccountOwner>
+    <AccountServicingInstitutionsReference>LSY 53739353469</AccountServicingInstitutionsReference>
+    <SupplementaryDetails>/NCFI/NBT834528,00/</SupplementaryDetails>
+  </Tag61>
+  <Tag86>
+    <Narrative>
+      <Line>/WDVY/55440596</Line>
+      <Line>/UQDR/SOCNDINSDISVN YNSEIFDM SVNOCN WQ HL</Line>
+      <Line>/KBNI/NR0067976592 596662321069</Line>
+    </Narrative>
+  </Tag86>
+  <Tag61>
+    <Date>169997</Date>
+    <EntryDate>2001</EntryDate>
+    <DebitOrCreditMark>C</DebitOrCreditMark>
+    <FundsCode />
+    <Amount>44026.67</Amount>
+    <TransactionTypeIdentificationCode>NCZN</TransactionTypeIdentificationCode>
+    <ReferenceAccountOwner>3579283273283550</ReferenceAccountOwner>
+    <AccountServicingInstitutionsReference>XSU 22314881287</AccountServicingInstitutionsReference>
+    <SupplementaryDetails>/VCYW/NQG42085,51/</SupplementaryDetails>
+  </Tag61>
+  <Tag86>
+    <Narrative>
+      <Line>/TDPP/61825885</Line>
+      <Line>/BQDI/SGTNDINTTISKU DNSTIADA FUNDBN FC EM</Line>
+      <Line>/WUGI/NI8912466547 262853425828</Line>
+    </Narrative>
+  </Tag86>
+  <Tag61>
+    <Date>576574</Date>
+    <EntryDate>4197</EntryDate>
+    <DebitOrCreditMark>C</DebitOrCreditMark>
+    <FundsCode />
+    <Amount>5765350.</Amount>
+    <TransactionTypeIdentificationCode>NCON</TransactionTypeIdentificationCode>
+    <ReferenceAccountOwner>7523179665327586</ReferenceAccountOwner>
+    <AccountServicingInstitutionsReference>BSO 18805414688</AccountServicingInstitutionsReference>
+    <SupplementaryDetails>/CCJN/NIE0973962,/</SupplementaryDetails>
+  </Tag61>
+  <Tag86>
+    <Narrative>
+      <Line>/HZDJ/19271140</Line>
+      <Line>/SGDB/SNPNDINXWISAQ INSZIODO TLNTXN IP DN</Line>
+      <Line>/XERI/NM6963804891 744357604743</Line>
+    </Narrative>
+  </Tag86>
+  <Tag62F>
+    <DOrCMark>C</DOrCMark>
+    <Date>923389</Date>
+    <Unit>NZQ</Unit>
+    <Amount>671349077.</Amount>
+  </Tag62F>
+  <Tag64>
+    <DOrCMark>C</DOrCMark>
+    <Date>368615</Date>
+    <Unit>NBJ</Unit>
+    <Amount>263258349.</Amount>
+  </Tag64>
+</TextBlock>

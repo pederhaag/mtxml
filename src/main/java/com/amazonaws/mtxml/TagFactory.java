@@ -313,7 +313,8 @@ public class TagFactory {
 
 		String fieldValue;
 		for (String fieldName : fieldNames) {
-			fieldValue = tagContentMatcher.group(fieldName);
+			String regexGroupName = fieldName.length() <= 32 ? fieldName : fieldName.substring(0, 32);
+			fieldValue = tagContentMatcher.group(regexGroupName);
 			if (fieldValue == null)
 				fieldValue = "";
 

@@ -1,0 +1,111 @@
+<TextBlock>
+  <Block16R Code="GENL">
+    <Field20C Qualifier="XDXT">
+      <Reference>34501989</Reference>
+    </Field20C>
+    <Field20C Qualifier="SBFH">
+      <Reference>S96677876461509</Reference>
+    </Field20C>
+    <Field23G>
+      <Function>NGDA</Function>
+    </Field23G>
+    <Field22F Qualifier="WNCN">
+      <Indicator>COPU</Indicator>
+    </Field22F>
+    <Field22F Qualifier="QTUH">
+      <Indicator>NFNC</Indicator>
+    </Field22F>
+    <Field98C Qualifier="MUMR">
+      <Date>47839515</Date>
+      <Time>113367</Time>
+    </Field98C>
+    <Field25D Qualifier="GZSC">
+      <StatusCode>HBNW</StatusCode>
+    </Field25D>
+  </Block16R>
+  <Block16R Code="USECU">
+    <Field35B>
+      <IdentificationOfSecurity>NQ2933710659</IdentificationOfSecurity>
+      <DescriptionOfSecurity>
+        <Line>JJNI SLDVMJM V/D 94/48/54/NMN/</Line>
+      </DescriptionOfSecurity>
+    </Field35B>
+    <Block16R Code="FIA">
+      <Field98A Qualifier="PSIC">
+        <Date>45702047</Date>
+      </Field98A>
+    </Block16R>
+    <Block16R Code="ACCTINFO">
+      <Field97A Qualifier="SYEH">
+        <AccountNumber>3509196</AccountNumber>
+      </Field97A>
+      <Field94C Qualifier="SSHU">
+        <CountryCode>NW</CountryCode>
+      </Field94C>
+      <Field93B Qualifier="HZIJ">
+        <QuantityTypeCode>KUAZ</QuantityTypeCode>
+        <Balance>81569367.</Balance>
+      </Field93B>
+      <Field93B Qualifier="SNIF">
+        <QuantityTypeCode>IOPC</QuantityTypeCode>
+        <Balance>80374103.</Balance>
+      </Field93B>
+    </Block16R>
+  </Block16R>
+  <Block16R Code="CAOPTN">
+    <Field13A Qualifier="LDIN">
+      <NumberId>013</NumberId>
+    </Field13A>
+    <Field22F Qualifier="GKHW">
+      <Indicator>YTSY</Indicator>
+    </Field22F>
+    <Field11A Qualifier="GYKN">
+      <CurrencyCode>NLR</CurrencyCode>
+    </Field11A>
+    <Field17B Qualifier="HOXO">
+      <Flag>D</Flag>
+    </Field17B>
+    <Block16R Code="SECMOVE">
+      <Field22H Qualifier="JHMN">
+        <Indicator>LGIG</Indicator>
+      </Field22H>
+      <Field35B>
+        <IdentificationOfSecurity>NQ3765705167</IdentificationOfSecurity>
+        <DescriptionOfSecurity>
+          <Line>KGNQ SQYCLYP E/J 89/25/72/NVK/</Line>
+        </DescriptionOfSecurity>
+      </Field35B>
+      <Field98A Qualifier="MOAV">
+        <Date>97458186</Date>
+      </Field98A>
+    </Block16R>
+    <Block16R Code="CASHMOVE">
+      <Field22H Qualifier="SARM">
+        <Indicator>XCPS</Indicator>
+      </Field22H>
+      <Field98A Qualifier="OKQY">
+        <Date>15331706</Date>
+      </Field98A>
+      <Field90B Qualifier="XTPA">
+        <AmountTypeCode>OIXB</AmountTypeCode>
+        <CurrencyCode>NTG</CurrencyCode>
+        <Price>8561.</Price>
+      </Field90B>
+    </Block16R>
+  </Block16R>
+  <Block16R Code="ADDINFO">
+    <Field70E Qualifier="YCNS">
+      <Narrative>
+        <Line>SWOPZH:</Line>
+        <Line>SOO NZRSNQ</Line>
+        <Line>ZTYGILVXIRN/SWSSCDK AVJZ:</Line>
+        <Line>48/82/2382</Line>
+        <Line>SLDKPL:</Line>
+        <Line>IKO (CENQWT)</Line>
+        <Line>WVOJIIUTIEN/JTSSXNY MNJZ:</Line>
+        <Line>85/42/6176</Line>
+        <Line>IMIQINIGIZJ FALW ONNQPNRVUCNN</Line>
+      </Narrative>
+    </Field70E>
+  </Block16R>
+</TextBlock>
