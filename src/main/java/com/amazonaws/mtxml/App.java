@@ -1,15 +1,10 @@
 package com.amazonaws.mtxml;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringEscapeUtils;
-//import org.json.JSONObject;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
@@ -21,37 +16,40 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
  */
 public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
-    public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent input, final Context context) {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "application/json");
+	public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent input, final Context context) {
+		try {
+			context.getLogger().log("input: " + input.toString());
+			Map<String, String> headers = new HashMap<>();
+			headers.put("Content-Type", "text/xml");
 
-        System.out.println("mt: " + input.getHeaders().get("mt"));
+			Map<String, String> queryStringParameters = input.getQueryStringParameters();
+			String mtMessage = queryStringParameters.get("MTMessage");
+			if ((mtMessage == null) || mtMessage.equals("")) {
+				throw new IllegalArgumentException("MTMessage parameter must be supplied.");
+			}
+			String xmlMsg = mtToXml(mtMessage);
 
-        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent()
-                .withHeaders(headers);
-        
-//        try {
-//            final String pageContents = this.getPageContents("https://checkip.amazonaws.com");
-//            String output = String.format("{ \"message\": \"hello world\", \"location\": \"%s\" }", pageContents);
-//
-//            return response
-//                    .withStatusCode(200)
-//                    .withBody(output);
-//        } catch (IOException e) {
-//            return response
-//                    .withBody("{}")
-//                    .withStatusCode(500);
-//        }
-        return response
-              .withStatusCode(200)
-//              .withBody("Why hello there2!");
-              .withBody("Sink...");
-    }
+			APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent().withHeaders(headers);
+			return response.withStatusCode(200).withBody(xmlMsg);
 
-    private String getPageContents(String address) throws IOException{
-        URL url = new URL(address);
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()))) {
-            return br.lines().collect(Collectors.joining(System.lineSeparator()));
-        }
-    }
+		} catch (Exception e) {
+			Map<String, String> headers = new HashMap<>();
+			headers.put("Content-Type", "text/plain");
+			String body = e.getMessage();
+			int statusCode = 500;
+			return new APIGatewayProxyResponseEvent().withBody(body).withStatusCode(statusCode);
+		}
+
+	}
+
+	private static String mtToXml(String mtMessage) throws IOException, UnknownTagException {
+		// Replace '\n' with actual newlines
+		final Pattern pattern = Pattern.compile("\\\\n", Pattern.MULTILINE);
+		final Matcher matcher = pattern.matcher(mtMessage);
+
+		// The substituted value will be contained in the result variable
+		mtMessage = matcher.replaceAll("\n");
+		return new Mt(mtMessage).toXml();
+	}
+
 }

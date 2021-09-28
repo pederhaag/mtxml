@@ -1,8 +1,9 @@
 package com.amazonaws.mtxml;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -13,23 +14,16 @@ import java.util.regex.Pattern;
 
 import de.siegmar.fastcsv.reader.CommentStrategy;
 import de.siegmar.fastcsv.reader.CsvReader;
-import de.siegmar.fastcsv.reader.CsvRow;
 import de.siegmar.fastcsv.reader.CsvReader.CsvReaderBuilder;
+import de.siegmar.fastcsv.reader.CsvRow;
 
 /**
+ * 
  * {@code TagFactory} is a factory-class for creating {@code Tag}-objects from
  * raw MT-format.
- * 
- * @author peder
  *
  */
 public class TagFactory {
-	/**
-	 * Constants pointing to the tag-definitions file
-	 */
-	private final static String RESOURCE_PATH = new File("src/main/resources").getAbsolutePath();
-	private final static String TAG_DEFINITIONS_PATH = RESOURCE_PATH + "/tagDefinitions.txt";
-
 	/**
 	 * Mapping for the different charactersets occurring in the MT-standard to
 	 * regex-expressions
@@ -100,7 +94,9 @@ public class TagFactory {
 	private void loadTagDefinitions() throws IOException, Exception {
 		// Objects for reading file
 		CsvReaderBuilder builder = CsvReader.builder().commentStrategy(CommentStrategy.SKIP).fieldSeparator('\t');
-		CsvReader reader = builder.build(new File(TAG_DEFINITIONS_PATH).toPath(), Charset.defaultCharset());
+//		CsvReader reader = builder.build(new File(TAG_DEFINITIONS_PATH).toPath(), Charset.defaultCharset());
+		CsvReader reader = builder.build(Paths.get(this.getClass().getResource("/tagDefinitions.txt").toURI()),
+				Charset.defaultCharset());
 
 		// Tools for getting field-names
 		Pattern fieldNamePattern = Pattern.compile(REGEX_FIELD_DESCRIPTION, Pattern.MULTILINE);
