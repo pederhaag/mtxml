@@ -100,13 +100,17 @@ public class TestCases {
 	public static ArrayList<String[]> getValidHeaderTags() {
 		ArrayList<String[]> tags = new ArrayList<String[]>();
 
-		tags.add(new String[] { "123", "SOMETHING" });
-		tags.add(new String[] { "111", "BLABLA" });
-		tags.add(new String[] { "222", "noreg" });
-		tags.add(new String[] { "ok", "num321" });
-		tags.add(new String[] { "001", "1n2n3" });
-		tags.add(new String[] { "002", "12312542365-64843524" });
-		tags.add(new String[] { "003", "XXX-XXX-XXX?" });
+		String nodeName = "nodeName";
+		String tagNodeName = "tagNodeName";
+		String valueNodeName = "valueNodeName";
+
+		tags.add(new String[] { "123", "SOMETHING", nodeName, tagNodeName, valueNodeName });
+		tags.add(new String[] { "111", "BLABLA", nodeName, tagNodeName, valueNodeName });
+		tags.add(new String[] { "222", "noreg", nodeName, tagNodeName, valueNodeName });
+		tags.add(new String[] { "ok", "num321", nodeName, tagNodeName, valueNodeName });
+		tags.add(new String[] { "001", "1n2n3", nodeName, tagNodeName, valueNodeName });
+		tags.add(new String[] { "002", "12312542365-64843524", nodeName, tagNodeName, valueNodeName });
+		tags.add(new String[] { "003", "XXX-XXX-XXX?", nodeName, tagNodeName, valueNodeName });
 
 		return tags;
 	}
@@ -119,9 +123,12 @@ public class TestCases {
 		blockData = new HashMap<String, String>();
 		blockData.put("rawContent", "{2:I527ABCDEFGHXBRAN3}");
 		blockData.put("BlockIdentifier", "2");
-		blockData.put("InOutID", "I");
-		blockData.put("MT", "527");
+		blockData.put("InputOutputIdentifier", "I");
+		blockData.put("MessageType", "527");
 		blockData.put("DestAddress", "ABCDEFGHXBRA");
+		blockData.put("DestAddress.BIC", "ABCDEFGHBRA");
+		blockData.put("DestAddress.LogicalTerminal", "X");
+		blockData.put("DestAddress.BIC8", "ABCDEFGH");
 		blockData.put("Priority", "N");
 		blockData.put("DeliveryMonitoring", "3");
 		blockData.put("ObsolencePeriod", "");
@@ -132,9 +139,12 @@ public class TestCases {
 		blockData = new HashMap<String, String>();
 		blockData.put("rawContent", "{2:I299DDDDEFGHXXXXU007}");
 		blockData.put("BlockIdentifier", "2");
-		blockData.put("InOutID", "I");
-		blockData.put("MT", "299");
+		blockData.put("InputOutputIdentifier", "I");
+		blockData.put("MessageType", "299");
 		blockData.put("DestAddress", "DDDDEFGHXXXX");
+		blockData.put("DestAddress.BIC", "DDDDEFGH");
+		blockData.put("DestAddress.LogicalTerminal", "X");
+		blockData.put("DestAddress.BIC8", "DDDDEFGH");
 		blockData.put("Priority", "U");
 		blockData.put("DeliveryMonitoring", "");
 		blockData.put("ObsolencePeriod", "007");
@@ -152,17 +162,17 @@ public class TestCases {
 		blockData = new HashMap<String, String>();
 		blockData.put("rawContent", "{2:O9400144210831BANKBICSAXXX61563916672108310144N}");
 		blockData.put("BlockIdentifier", "2");
-		blockData.put("InOutID", "O");
-		blockData.put("MT", "940");
+		blockData.put("InputOutputIdentifier", "O");
+		blockData.put("MessageType", "940");
 		blockData.put("InputTime", "0144");
 		blockData.put("MIR", "210831BANKBICSAXXX6156391667");
 		blockData.put("OutputDate", "210831");
 		blockData.put("OutputTime", "0144");
 		blockData.put("Priority", "N");
-		blockData.put("MIR.SendersDate", "210831");
-		blockData.put("MIR.LogicalTerminal", "BANKBICSAXXX");
-		blockData.put("MIR.SessionNumber", "6156");
-		blockData.put("MIR.SequenceNumber", "391667");
+		blockData.put("MIR_Details.SendersDate", "210831");
+		blockData.put("MIR_Details.LogicalTerminal", "BANKBICSAXXX");
+		blockData.put("MIR_Details.SessionNumber", "6156");
+		blockData.put("MIR_Details.SequenceNumber", "391667");
 		blockData.put("xml", expectedXmlApplicationHeader(blockData));
 		validBlocks.add(blockData);
 
@@ -170,17 +180,17 @@ public class TestCases {
 		blockData = new HashMap<String, String>();
 		blockData.put("rawContent", "{2:O5640004210831MYBANKTUBBRA99001234560101012000N}");
 		blockData.put("BlockIdentifier", "2");
-		blockData.put("InOutID", "O");
-		blockData.put("MT", "564");
+		blockData.put("InputOutputIdentifier", "O");
+		blockData.put("MessageType", "564");
 		blockData.put("InputTime", "0004");
 		blockData.put("MIR", "210831MYBANKTUBBRA9900123456");
 		blockData.put("OutputDate", "010101");
 		blockData.put("OutputTime", "2000");
 		blockData.put("Priority", "N");
-		blockData.put("MIR.SendersDate", "210831");
-		blockData.put("MIR.LogicalTerminal", "MYBANKTUBBRA");
-		blockData.put("MIR.SessionNumber", "9900");
-		blockData.put("MIR.SequenceNumber", "123456");
+		blockData.put("MIR_Details.SendersDate", "210831");
+		blockData.put("MIR_Details.LogicalTerminal", "MYBANKTUBBRA");
+		blockData.put("MIR_Details.SessionNumber", "9900");
+		blockData.put("MIR_Details.SequenceNumber", "123456");
 		blockData.put("xml", expectedXmlApplicationHeader(blockData));
 		validBlocks.add(blockData);
 
@@ -231,10 +241,10 @@ public class TestCases {
 		blockData = new HashMap<String, String>();
 		blockData.put("rawContent", "{1:F01MYBABBICAXXX0878450607}");
 		blockData.put("BlockIdentifier", "1");
-		blockData.put("AppID", "F");
-		blockData.put("ServiceID", "01");
+		blockData.put("ApplicationIdentifier", "F");
+		blockData.put("ServiceIdentifier", "01");
 		blockData.put("LTAddress", "MYBABBICAXXX");
-		blockData.put("LTAddress.BIC", "MYBABBICXXX");
+		blockData.put("LTAddress.BIC", "MYBABBIC");
 		blockData.put("LTAddress.LogicalTerminal", "A");
 		blockData.put("LTAddress.BIC8", "MYBABBIC");
 		blockData.put("SessionNumber", "0878");
@@ -246,8 +256,8 @@ public class TestCases {
 		blockData = new HashMap<String, String>();
 		blockData.put("rawContent", "{1:F01SOMEBIKKABRA1234995511}");
 		blockData.put("BlockIdentifier", "1");
-		blockData.put("AppID", "F");
-		blockData.put("ServiceID", "01");
+		blockData.put("ApplicationIdentifier", "F");
+		blockData.put("ServiceIdentifier", "01");
 		blockData.put("LTAddress", "SOMEBIKKABRA");
 		blockData.put("LTAddress.BIC", "SOMEBIKKBRA");
 		blockData.put("LTAddress.LogicalTerminal", "A");
@@ -264,8 +274,8 @@ public class TestCases {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(XmlFactory.openNode("BasicHeader"));
-		sb.append(XmlFactory.writeNode("ApplicationIdentifier", blockData.get("AppID")));
-		sb.append(XmlFactory.writeNode("ServiceIdentifier", blockData.get("ServiceID")));
+		sb.append(XmlFactory.writeNode("ApplicationIdentifier", blockData.get("ApplicationIdentifier")));
+		sb.append(XmlFactory.writeNode("ServiceIdentifier", blockData.get("ServiceIdentifier")));
 		sb.append(XmlFactory.writeNode("LTAddress", blockData.get("LTAddress")));
 
 		sb.append(XmlFactory.openNode("LTAddress_Details"));
@@ -286,10 +296,10 @@ public class TestCases {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(XmlFactory.openNode("ApplicationHeader"));
-		sb.append(XmlFactory.writeNode("InputOutputIdentifier", blockData.get("InOutID")));
-		sb.append(XmlFactory.writeNode("MessageType", blockData.get("MT")));
+		sb.append(XmlFactory.writeNode("InputOutputIdentifier", blockData.get("InputOutputIdentifier")));
+		sb.append(XmlFactory.writeNode("MessageType", blockData.get("MessageType")));
 
-		if (blockData.get("InOutID").equals("I")) {
+		if (blockData.get("InputOutputIdentifier").equals("I")) {
 			sb.append(XmlFactory.writeNode("DestAddress", blockData.get("DestAddress")));
 
 			sb.append(XmlFactory.openNode("DestAddress_Details"));
@@ -302,22 +312,22 @@ public class TestCases {
 			sb.append(XmlFactory.writeNode("DeliveryMonitoring", blockData.get("DeliveryMonitoring")));
 			sb.append(XmlFactory.writeNode("ObsolencePeriod", blockData.get("ObsolencePeriod")));
 
-		} else if (blockData.get("InOutID").equals("O")) {
+		} else if (blockData.get("InputOutputIdentifier").equals("O")) {
 			sb.append(XmlFactory.writeNode("InputTime", blockData.get("InputTime")));
 			sb.append(XmlFactory.writeNode("MIR", blockData.get("MIR")));
 
 			sb.append(XmlFactory.openNode("MIR_Details"));
-			sb.append(XmlFactory.writeNode("SendersDate", blockData.get("MIR.SendersDate")));
-			sb.append(XmlFactory.writeNode("LogicalTerminal", blockData.get("MIR.LogicalTerminal")));
-			sb.append(XmlFactory.writeNode("SessionNumber", blockData.get("MIR.SessionNumber")));
-			sb.append(XmlFactory.writeNode("SequenceNumber", blockData.get("MIR.SequenceNumber")));
+			sb.append(XmlFactory.writeNode("SendersDate", blockData.get("MIR_Details.SendersDate")));
+			sb.append(XmlFactory.writeNode("LogicalTerminal", blockData.get("MIR_Details.LogicalTerminal")));
+			sb.append(XmlFactory.writeNode("SessionNumber", blockData.get("MIR_Details.SessionNumber")));
+			sb.append(XmlFactory.writeNode("SequenceNumber", blockData.get("MIR_Details.SequenceNumber")));
 			sb.append(XmlFactory.closeNode("MIR_Details"));
 
 			sb.append(XmlFactory.writeNode("OutputDate", blockData.get("OutputDate")));
 			sb.append(XmlFactory.writeNode("OutputTime", blockData.get("OutputTime")));
 			sb.append(XmlFactory.writeNode("Priority", blockData.get("Priority")));
 		} else
-			throw new Exception("Unable to identify InOutID when constructing expected XML");
+			throw new Exception("Unable to identify InputOutputIdentifier when constructing expected XML");
 
 		sb.append(XmlFactory.closeNode("ApplicationHeader"));
 

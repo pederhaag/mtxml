@@ -2,21 +2,17 @@ package com.amazonaws.mtxml;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.amazonaws.mtxml.utils.XmlFactory;
 import com.amazonaws.test.utils.TestCases;
 import com.amazonaws.test.utils.TestingUtils;
 
@@ -72,21 +68,12 @@ public class BasicHeaderBlockTest {
 	}
 
 	/*
-	 * BlockIdentifier
-	 */
-	@ParameterizedTest
-	@MethodSource("validBlocks")
-	void testGetBlockIdentifier(Map<String, String> blockData) {
-		assertEquals(createAndGet(blockData.get("rawContent"), "BlockIdentifier"), "1");
-	}
-
-	/*
 	 * AppID
 	 */
 	@ParameterizedTest
 	@MethodSource("validBlocks")
 	void testGetAppID(Map<String, String> blockData) {
-		mapAssertEqual(blockData, "AppID");
+		mapAssertEqual(blockData, "ApplicationIdentifier");
 	}
 
 	/*
@@ -94,8 +81,8 @@ public class BasicHeaderBlockTest {
 	 */
 	@ParameterizedTest
 	@MethodSource("validBlocks")
-	void testGetServiceID(Map<String, String> blockData) {
-		mapAssertEqual(blockData, "ServiceID");
+	void testGetServiceIdentifier(Map<String, String> blockData) {
+		mapAssertEqual(blockData, "ServiceIdentifier");
 	}
 
 	/*

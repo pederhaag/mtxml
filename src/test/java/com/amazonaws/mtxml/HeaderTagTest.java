@@ -21,8 +21,8 @@ class HeaderTagTest {
 	 */
 	@ParameterizedTest
 	@MethodSource("validValues")
-	void testHeaderTagValidValues(String tag, String value) {
-		new HeaderTag(tag, value);
+	void testHeaderTagValidValues(String tag, String value, String nodeName, String tagNodeName, String valueNodeName) {
+		new HeaderTag(tag, value, nodeName, tagNodeName, valueNodeName);
 	}
 
 	/*
@@ -30,8 +30,8 @@ class HeaderTagTest {
 	 */
 	@ParameterizedTest
 	@MethodSource("validValues")
-	void testHeaderTagGetTag(String tag, String value) {
-		assertEquals(new HeaderTag(tag, value).tag, tag);
+	void testHeaderTagGetTag(String tag, String value, String nodeName, String tagNodeName, String valueNodeName) {
+		assertEquals(new HeaderTag(tag, value, nodeName, tagNodeName, valueNodeName).getTag(), tag);
 	}
 
 	/*
@@ -39,14 +39,19 @@ class HeaderTagTest {
 	 */
 	@ParameterizedTest
 	@MethodSource("validValues")
-	void testHeaderTagGetValue(String tag, String value) {
-		assertEquals(new HeaderTag(tag, value).value, value);
+	void testHeaderTagGetValue(String tag, String value, String nodeName, String tagNodeName, String valueNodeName) {
+		assertEquals(new HeaderTag(tag, value, nodeName, tagNodeName, valueNodeName).getValue(), value);
 	}
 
 	private static Stream<Arguments> validValues() {
 		Stream.Builder<Arguments> builder = Stream.builder();
-		for (String[] tagValuePair : validTags) {
-			builder.add(Arguments.arguments(tagValuePair[0], tagValuePair[1]));
+		for (String[] testCaseData : validTags) {
+			String tag = testCaseData[0];
+			String value = testCaseData[1];
+			String nodeName = testCaseData[2];
+			String tagNodeName = testCaseData[3];
+			String valueNodeName = testCaseData[4];
+			builder.add(Arguments.arguments(tag, value, nodeName, tagNodeName, valueNodeName));
 		}
 
 		return builder.build();
@@ -57,17 +62,17 @@ class HeaderTagTest {
 	 */
 	@Test
 	public void testNullTag() {
-		assertThrows(NullPointerException.class, () -> new HeaderTag(null, "somevalue"));
+		assertThrows(NullPointerException.class, () -> new HeaderTag(null, "somevalue", "A", "B", "C"));
 	}
 
 	@Test
 	public void testNullValue() {
-		assertThrows(NullPointerException.class, () -> new HeaderTag("123", null));
+		assertThrows(NullPointerException.class, () -> new HeaderTag("123", null, "A", "B", "C"));
 	}
 
 	@Test
 	public void testNull() {
-		assertThrows(NullPointerException.class, () -> new HeaderTag(null, null));
+		assertThrows(NullPointerException.class, () -> new HeaderTag(null, null, "A", "B", "C"));
 	}
 
 	/*
@@ -75,17 +80,32 @@ class HeaderTagTest {
 	 */
 	@Test
 	public void testEmptyTag() {
-		assertThrows(IllegalArgumentException.class, () -> new HeaderTag("", "somevalue"));
+		assertThrows(IllegalArgumentException.class, () -> new HeaderTag("", "somevalue", "A", "B", "C"));
+	}
+
+	@Test
+	public void testEmptyNodeName() {
+		assertThrows(IllegalArgumentException.class, () -> new HeaderTag("t", "somevalue", "", "B", "C"));
+	}
+
+	@Test
+	public void testEmptytagNodeName() {
+		assertThrows(IllegalArgumentException.class, () -> new HeaderTag("t", "somevalue", "A", "", "C"));
+	}
+
+	@Test
+	public void testEmptyValueNodeName() {
+		new HeaderTag("t", "somevalue", "A", "B", "");
 	}
 
 	@Test
 	public void testEmptyValue() {
-		new HeaderTag("123", "");
+		new HeaderTag("123", "", "A", "B", "C");
 	}
 
 	@Test
 	public void testEmpty() {
-		assertThrows(IllegalArgumentException.class, () -> new HeaderTag("", ""));
+		assertThrows(IllegalArgumentException.class, () -> new HeaderTag("", "", "A", "B", "C"));
 	}
 
 }

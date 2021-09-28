@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -60,6 +61,7 @@ public class TagFactory {
 	 * This regex parses identifies the different components of MT-standard format
 	 * of a tag
 	 */
+//	private static final String REGEX_TAG_INFO = "(?<BracketPrefix>\\[)?(?<Prefix>(?>[/A-Z :,])*)(?>(?<NewLine>\\\\n)|(?<UTCInd>\\[N\\]2!n\\[2!n\\])|(?<Length>\\d+(?>\\-\\d+|!|\\*\\d+)?)(?<Charset>n|a|h|x|y|z|c|d)|(?<Static>[^\\[\\]]))(?<Suffix>/*)(?<BracketSuffix>\\])?";
 	private static final String REGEX_TAG_INFO = "(?<BracketPrefix>\\[)?(?<Prefix>(?>[/A-Z :,])*)(?>(?<NewLine>\\\\n)|(?<UTCInd>\\[N\\]2!n\\[2!n\\])|(?<Length>\\d+(?>\\-\\d+|!|\\*\\d+)?)(?<Charset>n|a|h|x|y|z|c|d)|(?<Static>[^\\[\\]]))(?<Suffix>/*)(?<BracketSuffix>\\])?";
 
 	/**
@@ -131,6 +133,7 @@ public class TagFactory {
 					fieldNameMatcher.find();
 					fieldName = fieldNameMatcher.group(1);
 					fieldList.add(fieldName);
+					// Store the subfields character set
 					tagFieldsCharsets.put(tag + ":" + fieldName, tagInfoMatcher.group("Charset"));
 				}
 
@@ -204,6 +207,7 @@ public class TagFactory {
 	 * @throws Exception
 	 */
 	private static String createFieldRegex(Matcher tagInfoMatcher, String fieldName) throws Exception {
+		// Retrieve information from match result
 		String Prefix = regexExcape(tagInfoMatcher.group("Prefix"));
 		String length = tagInfoMatcher.group("Length");
 		String Charset = tagInfoMatcher.group("Charset");
@@ -212,6 +216,9 @@ public class TagFactory {
 		String UTCInd = tagInfoMatcher.group("UTCInd");
 		String newLine = tagInfoMatcher.group("NewLine");
 
+		// Regex groups only allow for groupname with a maximum length of 32 characters.
+		// As of now, fields will be unique with respect to the first 32 characters so
+		// we will use truncation if needed.
 		String fieldName32;
 		if (fieldName != null) {
 			fieldName32 = fieldName.length() > 32 ? fieldName.substring(0, 32) : fieldName;
@@ -219,52 +226,67 @@ public class TagFactory {
 			fieldName32 = fieldName;
 		}
 
+		// The string containing the final regex representing the field
 		String regex = null;
-		String fieldRegex = null;
 
+		// Depending on the case, we will start by creating an inner part of the regex
+		// and then create full regex later which also contains pre- and suffixes
+		String subRegex = null;
+
+		// Static field
 		if (staticField != null) {
 			if (fieldName.equals("Sign")) {
-				fieldRegex = String.format("(?<%s>(?>%s))", fieldName, staticField);
+				subRegex = String.format("(?<%s>(?>%s))", fieldName, staticField);
 			} else {
-				fieldRegex = String.format("(?>%s)", staticField);
+				subRegex = String.format("(?>%s)", staticField);
 			}
 
 		} else if (newLine != null) {
-			regex = "\\n";
+			// Simple newlines
+			regex = "\\R";
 
 		} else if (UTCInd != null) {
-			fieldRegex = String.format("(?<%s>(?>N?(?>%s{2}){1,2}))", fieldName32, charsetsPatterns.get("n"));
+			// UTCIndicators have a predefined format. The complexity is best handled on its
+			// own here
+			subRegex = String.format("(?<%s>(?>N?(?>%s{2}){1,2}))", fieldName32, charsetsPatterns.get("n"));
 
 		} else if (length.contains("*")) {
+			// The case of multiline fields. Each line has a maximum length, and the maximum
+			// number of lines is specified
+
+			// If the characterset contains newlines, then we will remove it
 			String characterSet = charsetsPatterns.get(Charset).replace("\\n", "");
+
 			int numLines = Integer.valueOf(length.split("\\*")[0]);
 			String lineLength = length.split("\\*")[1];
 
 			if (tagInfoMatcher.start() > 0) {
 				// If there is a multiline which is not the first field, then it needs to be
 				// starting on a new line
-				fieldRegex = String.format("\\n?(?<%s>(?>%s{0,%s})(?>\\n%s{0,%s}){0,%d})", fieldName32, characterSet,
+				subRegex = String.format("\\R?(?<%s>(?>%s{0,%s})(?>\\R%s{0,%s}){0,%d})", fieldName32, characterSet,
 						lineLength, characterSet, lineLength, numLines - 1);
 			} else {
 
-				fieldRegex = String.format("(?<%s>(?>%s{0,%s}(?>\\n%s{0,%s}){0,%d}))", fieldName32, characterSet,
+				subRegex = String.format("(?<%s>(?>%s{0,%s}(?>\\R%s{0,%s}){0,%d}))", fieldName32, characterSet,
 						lineLength, characterSet, lineLength, numLines - 1);
 			}
 		} else {
+			// Default case for a subfield
 			String charsetRegex = charsetsPatterns.get(Charset);
 			String lengthRegex = getRegexQuantifier(length);
-			fieldRegex = String.format("(?<%s>%s%s)", fieldName32, charsetRegex, lengthRegex);
+			subRegex = String.format("(?<%s>%s%s)", fieldName32, charsetRegex, lengthRegex);
 		}
 
 		if (regex == null) {
-			regex = String.format("%s%s%s", Prefix, fieldRegex, Suffix);
+			// Here we include the pre- and suffixes
+			regex = String.format("%s%s%s", Prefix, subRegex, Suffix);
 		}
 
 		return regex;
 	}
 
 	/**
-	 * Used to escape some characters
+	 * Used to escape some characters not already handled elsewhere
 	 */
 	private static String regexExcape(String regex) {
 		if (regex != null) {
@@ -299,39 +321,58 @@ public class TagFactory {
 		Objects.requireNonNull(tag, "Tag cannot be null");
 		Objects.requireNonNull(content, "Tagcontent cannot be null");
 
-		ArrayList<String> fieldNames = getTagFieldNames(tag);
+		// Map for underlying subfields
+		LinkedHashMap<String, MTComponent> subfields = new LinkedHashMap<String, MTComponent>();
+		String qualifier = null;
+
+		// Match the different subfields in the tag contents
 		String tagContentRegex = getTagRegex(tag);
 		Pattern tagContentPattern = Pattern.compile(tagContentRegex, Pattern.MULTILINE);
 		Matcher tagContentMatcher = tagContentPattern.matcher(content);
-		ArrayList<String> fieldValues = new ArrayList<String>();
 
 		if (!tagContentMatcher.find()) {
-			throw new MTSyntaxException(tagContentMatcher.pattern().toString(), tag);
+			throw new MTSyntaxException(tagContentRegex, tag);
 		}
 		if (tagContentMatcher.start() > 0)
-			throw new MTSyntaxException(tagContentMatcher.pattern().toString(), tag);
+			throw new MTSyntaxException(tagContentRegex, tag);
 
 		String fieldValue;
-		for (String fieldName : fieldNames) {
+		for (String fieldName : getTagFieldNames(tag)) {
+			// Retrieve groupname
 			String regexGroupName = fieldName.length() <= 32 ? fieldName : fieldName.substring(0, 32);
 			fieldValue = tagContentMatcher.group(regexGroupName);
-			if (fieldValue == null)
-				fieldValue = "";
 
-			if (Tag.isNumericField(fieldName))
-				validateNumericField(fieldValue);
+			if (fieldName.equals("Qualifier")) {
+				// Qualifier stored in its own variable
+				qualifier = fieldValue;
+			} else {
+				// null variables stored as empty strings
+				if (fieldValue == null)
+					fieldValue = "";
 
-			fieldValues.add(fieldValue);
+				// Additional validation is needed for numeric fields
+				if (Tag.isNumericField(fieldName)) {
+					validateNumericField(fieldValue);
+					// Translate MT number format with commas to numeric format with dots
+					fieldValue = fieldValue.replace(',', '.');
+				}
+
+				// Add the subfield as a MTEndNode
+				subfields.put(fieldName, new MTEndNode(fieldName, null, fieldValue));
+			}
 
 		}
 
+		// Give a warning if there are characters after the match which cannot be parsed
+		// as part of the tag
 		int noOverrunChars = content.length() - tagContentMatcher.end();
 		if (noOverrunChars > 0) {
 			System.out.println(String.format(
 					"[Warning] FieldOverrunError: An additional %d characters could not be successfully be treated as part of any subfield in tag %s.",
 					noOverrunChars, tag));
 		}
-		return new Tag(tag, fieldNames, fieldValues);
+
+		return new Tag(tag, content, qualifier, subfields);
 
 	}
 
@@ -379,12 +420,6 @@ public class TagFactory {
 			return tagRegex.get(tag);
 		}
 		throw new UnknownTagException(tag);
-	}
-
-	public static void main(String[] args) throws IOException, UnknownTagException {
-		TagFactory tf = new TagFactory();
-		System.out.println(tf.createTag("15A", "TEST"));
-
 	}
 
 }

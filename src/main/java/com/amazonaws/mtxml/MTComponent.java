@@ -15,4 +15,11 @@ interface MTComponent {
 	 *         its subcomponents
 	 */
 	public String toXml();
+
+	/**
+	 * Get the value of the component
+	 * 
+	 * @return A {@code String} describing the value of the component.
+	 */
+	public String getValue();
 }

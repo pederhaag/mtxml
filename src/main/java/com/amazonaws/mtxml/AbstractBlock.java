@@ -1,11 +1,7 @@
 package com.amazonaws.mtxml;
 
-import java.util.ArrayList;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.amazonaws.mtxml.utils.XmlFactory;
 
 /**
  * 
@@ -14,12 +10,11 @@ import com.amazonaws.mtxml.utils.XmlFactory;
  * sequence of tag-value pairs of the form {@code {t_i:v_i}}.
  *
  */
-public abstract class AbstractBlock implements MTComponent {
+public abstract class AbstractBlock extends MTTree {
 	/**
-	 * Regex pattern for identifying the tag-value pairs of the form {@code
-	 * {t_i:v_i}}
+	 * Regex pattern for identifying the tag-value pairs of the form
+	 * {@code {t_i:v_i}}
 	 */
-	// (?<UserHeader>\\{3:(?>\\{\\w*:[\\w\\/-]*\\})*\\})?
 	private final static String REGEX_PATTERN_TAG = "\\{(.*?):(.*?)\\}";
 
 	/**
@@ -29,12 +24,8 @@ public abstract class AbstractBlock implements MTComponent {
 
 	private final String blockIdentifier;
 
-	/**
-	 * Container for the tags
-	 */
-	private ArrayList<HeaderTag> tags;
-
-	AbstractBlock(String content, String BlockIdentifier) {
+	AbstractBlock(String content, String blockName, String BlockIdentifier) {
+		super(blockName, null);
 		this.blockIdentifier = BlockIdentifier;
 
 		// Regex pattern for splitting out the blockidentifier and the contents
@@ -47,7 +38,7 @@ public abstract class AbstractBlock implements MTComponent {
 		if (!blockmatcher.find()) {
 			throw new MTSyntaxException(regexPattern, content);
 		}
-		
+
 		String tagString = blockmatcher.group(2);
 
 		// Matching each tag
@@ -57,61 +48,52 @@ public abstract class AbstractBlock implements MTComponent {
 			throw new MTSyntaxException(REGEX_PATTERN_TAG_SEQUENCE, tagString);
 		}
 
+		// Search for tags
 		Pattern tagPattern = Pattern.compile(REGEX_PATTERN_TAG);
 		Matcher tagMatcher = tagPattern.matcher(tagString);
 
 		// Add found tags
-		tags = new ArrayList<HeaderTag>();
+		String xmlNodeName = getXmlTagNodeName();
+		String xmlNodeCodeName = getXmlTagCodeNodeName();
+		String xmlNodeValueName = getXmlTagValueNodeName();
 		while (tagMatcher.find()) {
-			addTag(tagMatcher.group(1), tagMatcher.group(2));
+			String tag = tagMatcher.group(1);
+			String value = tagMatcher.group(2);
+			addComponent("Tag" + tag, new HeaderTag(tag, value, xmlNodeName, xmlNodeCodeName, xmlNodeValueName));
 		}
-	}
-
-	public String toXml() {
-		String xml = XmlFactory.openNode(getXmlNodeName());
-		String nodeXmlContent;
-		for (HeaderTag t : tags) {
-			nodeXmlContent = XmlFactory.writeNode("Tag", t.tag) + XmlFactory.writeNode("Contents", t.value);
-			xml += XmlFactory.writeNode(getXmlTagNodeName(t.tag), nodeXmlContent);
-		}
-		xml += XmlFactory.closeNode(getXmlNodeName());
-		return xml;
 	}
 
 	/**
-	 * Get the name of the root node to be used in a XML representation
+	 * Method needed for constructing naming xml-nodes: The root node of each tag
+	 * xml
 	 */
-	abstract String getXmlNodeName();
-	abstract String getXmlTagNodeName(String tag);
+	abstract String getXmlTagNodeName();
 
-	public String getBlockIdentifier() {
-		return blockIdentifier;
-	}
+	/**
+	 * Method needed for constructing naming xml-nodes: The node containing the code
+	 * of the tag
+	 */
+	abstract String getXmlTagCodeNodeName();
 
-	private void addTag(String tag, String value) {
-		tags.add(new HeaderTag(tag, value));
-	}
+	/**
+	 * Method needed for constructing naming xml-nodes: The node containing the
+	 * value of the tag
+	 */
+	abstract String getXmlTagValueNodeName();
 
-	String getTag(String tag) {
-		Objects.requireNonNull(tag, "Tag cannot be null");
+	/**
+	 * Simple getter for fields in block. {@code AbstractBlock} implementation returns
+	 * the blockidentifier, else calls parent method.
+	 */
+	@Override
+	public String getData(String fieldName) {
+		if (fieldName.equals(""))
+			throw new IllegalArgumentException("Fieldname cannot be an empty string");
 
-		if (tag.equals("")) {
-			throw new IllegalArgumentException("Tag must be a non-empty string.");
+		if (fieldName.equals("BlockIdentifier")) {
+			return blockIdentifier;
 		}
-
-		if (tag.equals("BlockIdentifier")) {
-			return getBlockIdentifier();
-		}
-		for (HeaderTag t : tags) {
-			if (t.tag.equals(tag)) {
-				return t.value;
-			}
-		}
-		return null;
-	}
-
-	String getTag(int index) {
-		return tags.get(index).value;
+		return super.getData(fieldName);
 	}
 
 }

@@ -3,10 +3,7 @@ package com.amazonaws.mtxml;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.io.File;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -18,10 +15,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.amazonaws.mtxml.utils.XmlFactory;
 import com.amazonaws.test.utils.TestCases;
 import com.amazonaws.test.utils.TestingUtils;
-
-import de.siegmar.fastcsv.reader.CsvReader;
-import de.siegmar.fastcsv.reader.CsvReader.CsvReaderBuilder;
-import de.siegmar.fastcsv.reader.CsvRow;
 
 class TagTest {
 	private static TagFactory factory;
@@ -55,16 +48,16 @@ class TagTest {
 
 	@ParameterizedTest
 	@MethodSource("validTags")
-	void testGetFieldValue(Map<String, String> tagData) throws UnknownTagException {
+	void testGetData(Map<String, String> tagData) throws UnknownTagException {
 		String rawTagContent = tagData.get("RawContent");
 		Tag tag = factory.createTag(tagData.get("Tag"), rawTagContent.replace("\\n", "\n"));
 
 		for (String field : tagData.keySet()) {
 			if (!field.equals("RawContent")) {
 				String ExpectedValue = tagData.get(field).replace("\\n", "\n");
-				assertEquals(ExpectedValue, tag.getFieldValue(field),
-						String.format("Expected field '%s' to be equal to %s but got %s instead", field, ExpectedValue,
-								tag.getFieldValue(field)));
+				assertEquals(ExpectedValue, tag.getData(field),
+						String.format("Expected field '%s' to be equal to '%s' but got '%s' instead", field, ExpectedValue,
+								tag.getData(field)));
 			}
 		}
 

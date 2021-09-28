@@ -3,19 +3,22 @@ package com.amazonaws.mtxml;
 /**
  * Modelling of the userheader block in a MT-message
  */
-public class UserHeaderBlock extends AbstractBlock implements MTComponent {
+public class UserHeaderBlock extends AbstractBlock {
 
 	UserHeaderBlock(String content) {
-		super(content, "3");
+		super(content, "UserHeader", "3");
 	}
 
-	@Override
-	String getXmlNodeName() {
-		return "UserHeaderBlock";
-	}
-
-	@Override
-	String getXmlTagNodeName(String tag) {
+	String getXmlTagNodeName() {
 		return "UserTag";
 	}
+
+	String getXmlTagCodeNodeName() {
+		return "Tag";
+	}
+
+	String getXmlTagValueNodeName() {
+		return "Contents";
+	}
+
 }

@@ -5,19 +5,11 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import org.xmlunit.assertj3.XmlAssert;
-import org.xmlunit.xpath.JAXPXPathEngine;
-
-import com.amazonaws.mtxml.utils.XmlFactory;
-
-//import static org.xmlunit.matchers.EvaluateXPathMatcher.hasXPath;
-//import static org.hamcrest.CoreMatchers.equalTo;
 
 public class TestingUtils {
 
 	public static final String testFolderPath = new File("src/test").getAbsolutePath() + "/";
 	public static final String testResourcesPath = new File(testFolderPath + "resources").getAbsolutePath() + "/";
-
-	private static JAXPXPathEngine engine = new JAXPXPathEngine();
 
 	public static void assertXMLEqualIgnoreOrder(String testXml, String controlXml) {
 		XmlAssert.assertThat(testXml).and(controlXml).ignoreChildNodesOrder().areIdentical();

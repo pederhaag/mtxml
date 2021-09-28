@@ -1,12 +1,9 @@
 package com.amazonaws.mtxml;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -14,13 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import com.amazonaws.test.utils.TestingUtils;
-
-import de.siegmar.fastcsv.reader.CommentStrategy;
-import de.siegmar.fastcsv.reader.CsvReader;
-import de.siegmar.fastcsv.reader.CsvRow;
-import de.siegmar.fastcsv.reader.CsvReader.CsvReaderBuilder;
 
 abstract class TagBlockTest {
 	protected static Map<String, ArrayList<String[]>> validBlocks;
@@ -89,9 +79,9 @@ abstract class TagBlockTest {
 		for (String[] tagValuePair : tags) {
 			String tag = tagValuePair[0];
 			String tagValue = tagValuePair[1];
-			assertEquals(block.getTag(tag), tagValue);
+			assertEquals(block.getData("Tag" + tag), tagValue);
 		}
-		assertEquals(block.getTag("BlockIdentifier"), blockIdentifier);
+		assertEquals(block.getData("BlockIdentifier"), blockIdentifier);
 	}
 
 	/*
@@ -99,37 +89,37 @@ abstract class TagBlockTest {
 	 */
 	@ParameterizedTest
 	@MethodSource("blocksWithTags")
-	void testGetTagInt(String blockString, ArrayList<String[]> tags) {
+	void testGetDataInt(String blockString, ArrayList<String[]> tags) {
 		AbstractBlock block = createBlock(blockString);
 		for (int index = 0; index < tags.size(); index++) {
 			String[] tagValuePair = tags.get(index);
 			String tagValue = tagValuePair[1];
-			assertEquals(block.getTag(index), tagValue);
+			assertEquals(block.getData(index), tagValue);
 		}
 	}
 
 	@Test
-	abstract void testToXml();
+	abstract void testToXml(String block, String ctrlXml);
 
 	@ParameterizedTest
 	@MethodSource("validBlocks")
-	void testGetTagStringNull(String blockContent) {
+	void testGetDataStringNull(String blockContent) {
 		AbstractBlock block = createBlock(blockContent);
-		assertThrows(NullPointerException.class, () -> block.getTag(null));
+		assertThrows(NullPointerException.class, () -> block.getData(null));
 	}
 
 	@ParameterizedTest
 	@MethodSource("validBlocks")
-	void testGetTagStringEmpty(String blockContent) {
+	void testGetDataStringEmpty(String blockContent) {
 		AbstractBlock block = createBlock(blockContent);
-		assertThrows(IllegalArgumentException.class, () -> block.getTag(""));
+		assertThrows(IllegalArgumentException.class, () -> block.getData(""));
 	}
 
 	@ParameterizedTest
 	@MethodSource("validBlocks")
-	void testGetTagIntInvalid(String blockContent) {
+	void testGetDataIntInvalid(String blockContent) {
 		AbstractBlock block = createBlock(blockContent);
-		assertThrows(IndexOutOfBoundsException.class, () -> block.getTag(-3));
+		assertThrows(IndexOutOfBoundsException.class, () -> block.getData(-3));
 	}
 
 }
