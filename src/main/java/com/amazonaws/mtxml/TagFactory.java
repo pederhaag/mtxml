@@ -1,7 +1,6 @@
 package com.amazonaws.mtxml;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.ArrayList;

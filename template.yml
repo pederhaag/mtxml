@@ -3,37 +3,53 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   MTXML API
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 20
+    Timeout: 10
 
 Resources:
-  MtXmlFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  MtXmlGatewayApi:
+    Type: AWS::Serverless::Api
     Properties:
-      #CodeUri: #HelloWorldFunction
+      StageName: Prod
+      Auth:
+        ApiKeyRequired: true
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Description: Usage plan to MTXML API
+          Quota:
+            Limit: 100
+            Period: DAY
+          Throttle:
+            BurstLimit: 1
+            RateLimit: 1
+          UsagePlanName: MTXML Usage plan
+  MtXmlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
       Handler: com.amazonaws.mtxml.App::handleRequest
-      #Handler: helloworld.App::handleRequest
       Runtime: java11
       MemorySize: 512
-      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+      Environment:
         Variables:
           PARAM1: VALUE
       Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        ApiEvent:
+          Type: Api
           Properties:
             Path: /mttoxml
             Method: get
+            RestApiId:
+              Ref: MtXmlGatewayApi
+
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  MtXmlApi:
+  MtXmlGatewayApi:
     Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/mtxml/"
+    Value: !Sub "https://${MtXmlGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/mtxml/"
   MtXmlFunction:
     Description: "MT to XML Lambda Function ARN"
     Value: !GetAtt MtXmlFunction.Arn
